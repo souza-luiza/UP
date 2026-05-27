@@ -6,11 +6,33 @@ Sistema de organização universitária para ajudar estudantes a organizar e pla
 ---
 
 ## 🎒 Funcionalidades futuras
-**Planner:** Uma ferramenta de organização para planejar seu mês ou dia, adicionando suas tarefas em ordem, mantendo a lógica temporal.   
-**Pomodoro:** Um cronômetro de estudo.   
-**Calendário/Agenda:** Calendário com atividades programadas do usuário.   
-**Progresso Semanal:** Um indicador com a porcentagem de quantas tarefas já fez.   
-**Desafios Semanais:** Metas a serem cumpridas.   
-**Checklists:** Lista de tarefas diárias.   
-**Divisão de estudo com base em horários de aulas:** Um cronograma de estudos gerado com base nos horários do estudantes.   
-**Flashcards:** Conjunto de flashcards que auxiliam no estudo do usuário.
+
+### 📅 Geração automática de cronograma semanal    
+Sistema responsável por gerar blocos de estudo automaticamente com base em:
+- horários de aula;
+- tempo livre do estudante;
+- matérias cadastradas;
+- prioridade ou dificuldade das disciplinas.
+
+### 📝 Tarefas acadêmicas   
+- criação de tarefas;
+- definição de prazo;
+- marcação de conclusão;
+- alertas de vencimento próximos.
+
+### 📆 Calendário acadêmico    
+Visualização integrada de:
+- tarefas;
+- sessões de estudo do cronograma semanal.
+
+### 🧠 Flashcards com revisão espaçada    
+Sistema de flashcards com lógica de repetição espaçada:
+- acertos aumentam o intervalo de revisão;
+- erros reduzem o intervalo da próxima revisão.
+
+---
+
+## 🚀 Tecnologias
+- Java Spring Boot
+- PostgreSQL
+- Next.js
