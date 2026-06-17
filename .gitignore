@@ -56,3 +56,5 @@ up-back/build/
 
 ### VS Code ###
 up-back/.vscode/
+
+.env
