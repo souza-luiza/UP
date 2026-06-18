@@ -1,13 +1,11 @@
 package com.up.up_back.controller;
 
-import com.up.up_back.dto.RegisterUserDto;
-import com.up.up_back.entity.User;
+import com.up.up_back.dto.user.RegisterUserDto;
+import com.up.up_back.dto.user.UserResponseDto;
 import com.up.up_back.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -17,7 +15,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User create(@RequestBody RegisterUserDto dto) {
+    public UserResponseDto create(@Valid @RequestBody RegisterUserDto dto) {
         return userService.create(dto);
     }
 }
