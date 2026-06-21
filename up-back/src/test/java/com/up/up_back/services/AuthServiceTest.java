@@ -243,4 +243,11 @@ class AuthServiceTest {
         when(refreshTokenRepository.findByToken("refresh-token")).thenReturn(Optional.of(refreshToken));
         assertThrows(InvalidRefreshTokenException.class, () -> authService.refresh("refresh-token"));
     }
+
+    @Test
+    void shouldDeleteRefreshTokenOnLogout() {
+
+        authService.logout("refresh-token");
+        verify(refreshTokenRepository).deleteByToken("refresh-token");
+    }
 }
