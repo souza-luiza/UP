@@ -164,8 +164,12 @@ class AuthControllerIntegrationTest {
         Cookie refreshCookie = loginResult.getResponse().getCookie("refreshToken");
         assertNotNull(refreshCookie);
 
+        String responseBody = loginResult.getResponse().getContentAsString();
+        String accessToken = com.jayway.jsonpath.JsonPath.read(responseBody, "$.accessToken");
+
         mockMvc.perform(
                         post("/auth/logout")
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                                 .cookie(refreshCookie)
                 )
                 .andExpect(status().isOk())
