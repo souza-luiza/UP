@@ -52,4 +52,23 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponseDto(accessToken));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
+
+        if(refreshToken != null) authService.logout(refreshToken);
+
+        ResponseCookie cookie = ResponseCookie
+                .from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
 }
