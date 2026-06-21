@@ -5,6 +5,7 @@ import com.up.up_back.dto.auth.LoginRequestDto;
 import com.up.up_back.entity.RefreshToken;
 import com.up.up_back.entity.User;
 import com.up.up_back.exception.InvalidCredentialsException;
+import com.up.up_back.exception.InvalidRefreshTokenException;
 import com.up.up_back.repository.RefreshTokenRepository;
 import com.up.up_back.repository.UserRepository;
 import com.up.up_back.security.JwtService;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -190,5 +192,55 @@ class AuthServiceTest {
         assertNotNull(savedToken);
         assertEquals("refresh-token", savedToken.getToken());
         assertEquals(user, savedToken.getUser());
+    }
+
+    @Test
+    void shouldGenerateNewAccessTokenFromRefreshToken() {
+
+        User user = User.builder()
+                .id(1L)
+                .name("Joao")
+                .email("joao@gmail.com")
+                .password("encrypted-password")
+                .build();
+
+        RefreshToken refreshToken =  RefreshToken.builder()
+                .token("refresh-token")
+                .user(user)
+                .expiresAt(Instant.now().plusSeconds(3600))
+                .build();
+
+        when(refreshTokenRepository.findByToken("refresh-token")).thenReturn(Optional.of(refreshToken));
+        when(jwtService.generateAccessToken(user.getEmail())).thenReturn("new-access-token");
+
+        String accessToken = authService.refresh("refresh-token");
+        assertEquals("new-access-token", accessToken);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRefreshTokenDoesNotExist() {
+
+        when(refreshTokenRepository.findByToken("invalid-token")).thenReturn(Optional.empty());
+        assertThrows(InvalidRefreshTokenException.class, () -> authService.refresh("invalid-token"));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRefreshTokenIsExpired() {
+
+        User user = User.builder()
+                .id(1L)
+                .name("Joao")
+                .email("joao@gmail.com")
+                .password("encrypted-password")
+                .build();
+
+        RefreshToken refreshToken =  RefreshToken.builder()
+                .token("refresh-token")
+                .user(user)
+                .expiresAt(Instant.now().minusSeconds(60))
+                .build();
+
+        when(refreshTokenRepository.findByToken("refresh-token")).thenReturn(Optional.of(refreshToken));
+        assertThrows(InvalidRefreshTokenException.class, () -> authService.refresh("refresh-token"));
     }
 }
