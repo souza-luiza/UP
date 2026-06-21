@@ -14,10 +14,10 @@ import tools.jackson.databind.ObjectMapper;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = {"api.security.token.secret=chave_secreta_para_os_testes_de_integracao_do_projeto_up_com_mais_de_32_bytes"})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class UserControllerIntegrationTest {
+class UserRegistrationIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
