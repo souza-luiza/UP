@@ -4,6 +4,7 @@ import com.up.up_back.dto.auth.LoginRequestDto;
 import com.up.up_back.entity.User;
 import com.up.up_back.repository.RefreshTokenRepository;
 import com.up.up_back.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.ObjectMapper;
 
 
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -104,6 +107,42 @@ class AuthControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto))
                 )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldRefreshAccessToken() throws Exception {
+
+        LoginRequestDto dto = new LoginRequestDto(
+                "joao@gmail.com",
+                "123456"
+        );
+
+        MvcResult loginResult = mockMvc.perform(
+                post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+        )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Cookie refreshCookie = loginResult.getResponse().getCookie("refreshToken");
+        assertNotNull(refreshCookie);
+
+        mockMvc.perform(
+                post("/auth/refresh")
+                        .cookie(refreshCookie)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists());
+    }
+
+    @Test
+    void shouldReturnUnauthorizedWhenRefreshTokenIsMissing() throws Exception {
+
+        mockMvc.perform(
+                post("/auth/refresh")
+        )
                 .andExpect(status().isUnauthorized());
     }
 }
