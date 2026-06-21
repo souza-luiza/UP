@@ -3,15 +3,13 @@ package com.up.up_back.controller;
 import com.up.up_back.dto.auth.AuthTokensDto;
 import com.up.up_back.dto.auth.LoginRequestDto;
 import com.up.up_back.dto.auth.LoginResponseDto;
+import com.up.up_back.exception.InvalidRefreshTokenException;
 import com.up.up_back.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
@@ -42,6 +40,16 @@ public class AuthController {
                 ).body(
                         new LoginResponseDto(tokens.accessToken())
                 );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDto> refresh(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
+
+        if(refreshToken == null) throw new InvalidRefreshTokenException("Refresh token not found");
+
+        String accessToken = authService.refresh(refreshToken);
+
+        return ResponseEntity.ok(new LoginResponseDto(accessToken));
     }
 
 }
