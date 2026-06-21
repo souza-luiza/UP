@@ -145,4 +145,30 @@ class AuthControllerIntegrationTest {
         )
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void shouldLogoutSuccessfully() throws Exception {
+
+        LoginRequestDto dto = new LoginRequestDto(
+                "joao@gmail.com",
+                "123456"
+        );
+
+        MvcResult loginResult = mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andReturn();
+
+        Cookie refreshCookie = loginResult.getResponse().getCookie("refreshToken");
+        assertNotNull(refreshCookie);
+
+        mockMvc.perform(
+                        post("/auth/logout")
+                                .cookie(refreshCookie)
+                )
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("Max-Age=0")));
+    }
 }
