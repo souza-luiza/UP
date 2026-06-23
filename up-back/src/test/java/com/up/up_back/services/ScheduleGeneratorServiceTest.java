@@ -259,4 +259,37 @@ class ScheduleGeneratorServiceTest {
 
         assertTrue(sessions.isEmpty());
     }
+
+    @Test
+    void shouldThrowExceptionWhenThereIsNotEnoughTimeForAllSubjects() {
+
+        Subject bd = Subject.builder()
+                .name("Banco de Dados")
+                .difficulty(5)
+                .build();
+
+        Subject poo = Subject.builder()
+                .name("POO")
+                .difficulty(3)
+                .build();
+
+        Subject calculo = Subject.builder()
+                .name("Calculo")
+                .difficulty(4)
+                .build();
+
+        Availability availability = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(20, 0))
+                .build();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> scheduleGeneratorService.generate(
+                        List.of(bd, poo, calculo),
+                        List.of(availability),
+                        List.of()
+                ));
+    }
 }

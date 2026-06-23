@@ -16,11 +16,19 @@ public class ScheduleGeneratorServiceImpl implements ScheduleGeneratorService {
 
     private static final long MAX_SESSION_MINUTES = 120;
 
+    private static final long MINIMUM_MINUTES_PER_SUBJECT = 30;
+
     @Override
     public List<StudySession> generate(List<Subject> subjects, List<Availability> availabilities, List<ClassSession> classes) {
         List<StudySession> sessions = new ArrayList<>();
 
         long availableMinutes = calculateAvailableMinutes(availabilities);
+
+        long minimumRequiredMinutes = (long) subjects.size() * MINIMUM_MINUTES_PER_SUBJECT;
+
+        if (availableMinutes < minimumRequiredMinutes) {
+            throw new IllegalArgumentException("Not enough available time to generate schedule");
+        }
 
         int totalDifficulty = subjects.stream()
                 .mapToInt(Subject::difficulty)
