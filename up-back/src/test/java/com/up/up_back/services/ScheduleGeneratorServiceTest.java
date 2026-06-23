@@ -1,7 +1,6 @@
 package com.up.up_back.services;
 
 import com.up.up_back.domain.Availability;
-import com.up.up_back.domain.ClassSession;
 import com.up.up_back.domain.StudySession;
 import com.up.up_back.domain.Subject;
 import org.junit.jupiter.api.Test;
@@ -210,6 +209,54 @@ class ScheduleGeneratorServiceTest {
     @Test
     void shouldGenerateSessionsAcrossMultipleDays() {
 
+        Subject bd = Subject.builder()
+                .name("Banco de Dados")
+                .difficulty(5)
+                .build();
 
+        Availability monday = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(21, 0))
+                .build();
+
+        Availability wednesday = Availability.builder()
+                .dayOfWeek(DayOfWeek.WEDNESDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(21, 0))
+                .build();
+
+        Availability friday = Availability.builder()
+                .dayOfWeek(DayOfWeek.FRIDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(21, 0))
+                .build();
+
+        List<StudySession> sessions = scheduleGeneratorService.generate(
+                List.of(bd),
+                List.of(monday, wednesday, friday),
+                List.of()
+        );
+
+        assertTrue(sessions.stream().anyMatch(s -> s.dayOfWeek() == DayOfWeek.MONDAY));
+        assertTrue(sessions.stream().anyMatch(s -> s.dayOfWeek() == DayOfWeek.WEDNESDAY));
+        assertTrue(sessions.stream().anyMatch(s -> s.dayOfWeek() == DayOfWeek.FRIDAY));
+    }
+
+    @Test
+    void shouldReturnEmptyScheduleWhenThereIsNoAvailability() {
+
+        Subject bd = Subject.builder()
+                .name("Banco de Dados")
+                .difficulty(5)
+                .build();
+
+        List<StudySession> sessions = scheduleGeneratorService.generate(
+                List.of(bd),
+                List.of(),
+                List.of()
+        );
+
+        assertTrue(sessions.isEmpty());
     }
 }
