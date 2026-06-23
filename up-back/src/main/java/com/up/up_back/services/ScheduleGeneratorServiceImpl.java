@@ -14,6 +14,8 @@ import java.util.List;
 @Service
 public class ScheduleGeneratorServiceImpl implements ScheduleGeneratorService {
 
+    private static final long MAX_SESSION_MINUTES = 120;
+
     @Override
     public List<StudySession> generate(List<Subject> subjects, List<Availability> availabilities, List<ClassSession> classes) {
         List<StudySession> sessions = new ArrayList<>();
@@ -37,24 +39,33 @@ public class ScheduleGeneratorServiceImpl implements ScheduleGeneratorService {
 
             boolean isLastSubject = i == subjects.size() - 1; // Mudanca minima para TDD
 
-            if(isLastSubject) subjectMinutes = availableMinutes - allocatedMinutes; // Mudanca minima para TDD
+            if (isLastSubject) subjectMinutes = availableMinutes - allocatedMinutes; // Mudanca minima para TDD
 
-            StudySession session = StudySession.builder()
-                    .subjectName(subject.name())
-                    .dayOfWeek(availability.dayOfWeek())
-                    .start(LocalTime.of(
-                            (int) currentMinute / 60,
-                            (int) currentMinute % 60
-                    ))
-                    .end(LocalTime.of(
-                            (int) (currentMinute + subjectMinutes) / 60,
-                            (int) (currentMinute + subjectMinutes) % 60
-                    ))
-                    .build();
+            long remainingMinutes = subjectMinutes;
 
-            sessions.add(session);
+            while(remainingMinutes > 0) {
 
-            currentMinute += subjectMinutes;
+                long sessionMinutes = Math.min(remainingMinutes, MAX_SESSION_MINUTES);
+
+                StudySession session = StudySession.builder()
+                        .subjectName(subject.name())
+                        .dayOfWeek(availability.dayOfWeek())
+                        .start(LocalTime.of(
+                                (int) currentMinute / 60,
+                                (int) currentMinute % 60
+                        ))
+                        .end(LocalTime.of(
+                                (int) (currentMinute + sessionMinutes) / 60,
+                                (int) (currentMinute + sessionMinutes) % 60
+                        ))
+                        .build();
+
+                sessions.add(session);
+
+                currentMinute += sessionMinutes;
+
+                remainingMinutes -= sessionMinutes;
+            }
 
             allocatedMinutes += subjectMinutes; // Mudanca minima para TDD
         }
