@@ -28,9 +28,16 @@ public class ScheduleGeneratorServiceImpl implements ScheduleGeneratorService {
 
         long currentMinute = availability.start().toSecondOfDay() / 60;
 
-        for(Subject subject : subjects) {
+        long allocatedMinutes = 0; // Mudanca minima para TDD
+
+        for (int i = 0; i < subjects.size(); i++) {
+            Subject subject = subjects.get(i);
 
             long subjectMinutes = availableMinutes * subject.difficulty() / totalDifficulty;
+
+            boolean isLastSubject = i == subjects.size() - 1; // Mudanca minima para TDD
+
+            if(isLastSubject) subjectMinutes = availableMinutes - allocatedMinutes; // Mudanca minima para TDD
 
             StudySession session = StudySession.builder()
                     .subjectName(subject.name())
@@ -48,6 +55,8 @@ public class ScheduleGeneratorServiceImpl implements ScheduleGeneratorService {
             sessions.add(session);
 
             currentMinute += subjectMinutes;
+
+            allocatedMinutes += subjectMinutes; // Mudanca minima para TDD
         }
 
         return sessions;

@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ScheduleGeneratorServiceTest {
@@ -52,5 +53,69 @@ class ScheduleGeneratorServiceTest {
                 .sum();
 
         assertTrue(bdMinutes > pooMinutes);
+    }
+
+    @Test
+    void shouldAllocateAllAvailableTime() {
+
+        Subject poo = Subject.builder()
+                .name("POO")
+                .difficulty(1)
+                .build();
+
+        Subject bd = Subject.builder()
+                .name("Banco de Dados")
+                .difficulty(5)
+                .build();
+
+        Availability availability = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(14, 0))
+                .end(LocalTime.of(20, 0))
+                .build();
+
+        List<StudySession> sessions = scheduleGeneratorService.generate(
+                List.of(poo, bd),
+                List.of(availability),
+                List.of()
+        );
+
+        long totalMinutes = sessions.stream()
+                .mapToLong(session -> Duration.between(session.start(), session.end()).toMinutes())
+                .sum();
+
+        assertEquals(360, totalMinutes);
+    }
+
+    @Test
+    void shouldAllocateAllAvailableTimeEvenWhenDivisionProducesRemainder() {
+
+        Subject poo = Subject.builder()
+                .name("POO")
+                .difficulty(1)
+                .build();
+
+        Subject bd = Subject.builder()
+                .name("Banco de Dados")
+                .difficulty(5)
+                .build();
+
+        Availability availability = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(14, 0))
+                .end(LocalTime.of(20, 5))
+                .build();
+
+        List<StudySession> sessions = scheduleGeneratorService.generate(
+                List.of(poo, bd),
+                List.of(availability),
+                List.of()
+        );
+
+        long totalMinutes = sessions.stream()
+                .mapToLong(session -> Duration.between(session.start(), session.end()).toMinutes())
+                .sum();
+
+        assertEquals(365, totalMinutes);
     }
 }
