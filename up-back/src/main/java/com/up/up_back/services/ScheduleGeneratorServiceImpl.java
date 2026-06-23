@@ -20,56 +20,77 @@ public class ScheduleGeneratorServiceImpl implements ScheduleGeneratorService {
     public List<StudySession> generate(List<Subject> subjects, List<Availability> availabilities, List<ClassSession> classes) {
         List<StudySession> sessions = new ArrayList<>();
 
-        Availability availability = availabilities.getFirst();
-
-        long availableMinutes = Duration.between(availability.start(), availability.end()).toMinutes();
+        long availableMinutes = calculateAvailableMinutes(availabilities);
 
         int totalDifficulty = subjects.stream()
                 .mapToInt(Subject::difficulty)
                 .sum();
 
-        long currentMinute = availability.start().toSecondOfDay() / 60;
-
-        long allocatedMinutes = 0; // Mudanca minima para TDD
+        long allocatedMinutes = 0;
 
         for (int i = 0; i < subjects.size(); i++) {
+
             Subject subject = subjects.get(i);
 
             long subjectMinutes = availableMinutes * subject.difficulty() / totalDifficulty;
 
-            boolean isLastSubject = i == subjects.size() - 1; // Mudanca minima para TDD
+            boolean isLastSubject = i == subjects.size() - 1;
 
-            if (isLastSubject) subjectMinutes = availableMinutes - allocatedMinutes; // Mudanca minima para TDD
+            if (isLastSubject) subjectMinutes = availableMinutes - allocatedMinutes;
 
-            long remainingMinutes = subjectMinutes;
+            allocateSubject(subject, subjectMinutes, availabilities, sessions);
 
-            while(remainingMinutes > 0) {
+            allocatedMinutes += subjectMinutes;
+        }
 
-                long sessionMinutes = Math.min(remainingMinutes, MAX_SESSION_MINUTES);
+        return sessions;
+    }
+
+    private long calculateAvailableMinutes( List<Availability> availabilities ) {
+
+        return availabilities.stream()
+                .mapToLong(
+                        availability ->
+                                Duration.between(availability.start(), availability.end()).toMinutes()
+                )
+                .sum();
+    }
+
+    private void allocateSubject(Subject subject, long subjectMinutes, List<Availability> availabilities, List<StudySession> sessions) {
+
+        long remainingMinutes = subjectMinutes;
+
+        for(Availability availability : availabilities) {
+
+            if(remainingMinutes <= 0) break;
+
+            long availabilityMinutes = Duration.between(availability.start(), availability.end()).toMinutes();
+
+            long minutesToAllocate = Math.min(remainingMinutes, availabilityMinutes);
+
+            long currentMinute = availability.start().toSecondOfDay() / 60;
+
+            long remainingAvailabilityMinutes = minutesToAllocate;
+
+            while (remainingAvailabilityMinutes > 0) {
+
+                long sessionMinutes = Math.min(remainingAvailabilityMinutes, MAX_SESSION_MINUTES);
 
                 StudySession session = StudySession.builder()
                         .subjectName(subject.name())
                         .dayOfWeek(availability.dayOfWeek())
-                        .start(LocalTime.of(
-                                (int) currentMinute / 60,
-                                (int) currentMinute % 60
-                        ))
-                        .end(LocalTime.of(
-                                (int) (currentMinute + sessionMinutes) / 60,
-                                (int) (currentMinute + sessionMinutes) % 60
-                        ))
+                        .start(LocalTime.of((int) currentMinute / 60, (int) currentMinute % 60))
+                        .end(LocalTime.of((int) (currentMinute + sessionMinutes) / 60, (int) (currentMinute + sessionMinutes) % 60))
                         .build();
 
                 sessions.add(session);
 
                 currentMinute += sessionMinutes;
 
-                remainingMinutes -= sessionMinutes;
+                remainingAvailabilityMinutes -= sessionMinutes;
             }
 
-            allocatedMinutes += subjectMinutes; // Mudanca minima para TDD
+            remainingMinutes -= minutesToAllocate;
         }
-
-        return sessions;
     }
 }

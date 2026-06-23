@@ -1,6 +1,7 @@
 package com.up.up_back.services;
 
 import com.up.up_back.domain.Availability;
+import com.up.up_back.domain.ClassSession;
 import com.up.up_back.domain.StudySession;
 import com.up.up_back.domain.Subject;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ScheduleGeneratorServiceTest {
 
@@ -166,5 +166,50 @@ class ScheduleGeneratorServiceTest {
         );
 
         assertTrue(sessions.size() > 1);
+    }
+
+    @Test
+    void shouldUseAllAvailabilities() {
+
+        Subject bd = Subject.builder()
+                .name("Banco de Dados")
+                .difficulty(5)
+                .build();
+
+        Availability monday = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(21, 0))
+                .build();
+
+        Availability wednesday = Availability.builder()
+                .dayOfWeek(DayOfWeek.WEDNESDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(21, 0))
+                .build();
+
+        Availability friday = Availability.builder()
+                .dayOfWeek(DayOfWeek.FRIDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(21, 0))
+                .build();
+
+        List<StudySession> sessions = scheduleGeneratorService.generate(
+                List.of(bd),
+                List.of(monday, wednesday, friday),
+                List.of()
+        );
+
+        long totalMinutes = sessions.stream()
+                .mapToLong(session -> Duration.between(session.start(), session.end()).toMinutes())
+                .sum();
+
+        assertEquals(360, totalMinutes);
+    }
+
+    @Test
+    void shouldGenerateSessionsAcrossMultipleDays() {
+
+
     }
 }
