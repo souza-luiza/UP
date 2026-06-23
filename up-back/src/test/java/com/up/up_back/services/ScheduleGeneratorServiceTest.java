@@ -244,20 +244,20 @@ class ScheduleGeneratorServiceTest {
     }
 
     @Test
-    void shouldReturnEmptyScheduleWhenThereIsNoAvailability() {
+    void shouldThrowExceptionWhenThereIsNoAvailability() {
 
         Subject bd = Subject.builder()
                 .name("Banco de Dados")
                 .difficulty(5)
                 .build();
 
-        List<StudySession> sessions = scheduleGeneratorService.generate(
-                List.of(bd),
-                List.of(),
-                List.of()
-        );
-
-        assertTrue(sessions.isEmpty());
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> scheduleGeneratorService.generate(
+                        List.of(bd),
+                        List.of(),
+                        List.of()
+                ));
     }
 
     @Test
