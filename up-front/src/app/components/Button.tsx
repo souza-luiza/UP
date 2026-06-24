@@ -13,7 +13,7 @@ export default function Button({ children, className, variant = 'primary', href,
         outline: 'border-2 border-black text-black  hover:shadow-[0_0_4px_#000000]'
     }[variant];
 
-    const classes = `flex justify-center items-center py-2 px-5 rounded-md-custom text-b1 font-regular transition-all duration-150 ease-in-out ${variantStyles} ${className || ''}`;
+    const classes = `flex justify-center items-center py-2 px-5 rounded-md-custom text-p font-regular transition-all duration-150 ease-in-out ${variantStyles} ${className || ''}`;
 
     if(href) {
         return (
