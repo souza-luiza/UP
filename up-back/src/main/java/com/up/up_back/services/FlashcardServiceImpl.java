@@ -1,5 +1,6 @@
 package com.up.up_back.services;
 
+import com.up.up_back.domain.ReviewResult;
 import com.up.up_back.dto.flashcard.CreateFlashcardDto;
 import com.up.up_back.entity.Flashcard;
 import com.up.up_back.entity.User;
@@ -15,6 +16,8 @@ import java.util.List;
 public class FlashcardServiceImpl implements FlashcardService {
 
     private final FlashcardRepository flashcardRepository;
+
+    private final FlashcardReviewService flashcardReviewService;
 
     @Override
     public Flashcard create(CreateFlashcardDto dto, User user) {
@@ -40,5 +43,26 @@ public class FlashcardServiceImpl implements FlashcardService {
     public List<Flashcard> findCardsDueForReview(User user) {
 
         return flashcardRepository.findByUserAndNextReviewDateLessThanEqual(user, LocalDate.now());
+    }
+
+    @Override
+    public Flashcard review(Long flashcardId, boolean correct, User user) {
+
+        Flashcard flashcard =
+                flashcardRepository.findById(flashcardId)
+                        .orElseThrow(
+                                () -> new RuntimeException("Flashcard not found")
+                        );
+
+        if (!flashcard.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("You do not own this flashcard");
+        }
+
+        ReviewResult result = flashcardReviewService.review(flashcard.getReviewLevel(), correct);
+
+        flashcard.setReviewLevel(result.reviewLevel());
+        flashcard.setNextReviewDate(result.nextReviewDate());
+
+        return flashcardRepository.save(flashcard);
     }
 }

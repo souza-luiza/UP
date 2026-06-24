@@ -13,4 +13,6 @@ public interface FlashcardService {
     List<Flashcard> findAllByUser(User user);
 
     List<Flashcard> findCardsDueForReview(User user);
+
+    Flashcard review(Long flashcardId, boolean correct, User user);
 }
