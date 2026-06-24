@@ -85,8 +85,9 @@ public class ScheduleControllerIntegrationTest {
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sessions").isArray())
-                .andExpect(jsonPath("$.sessions.length()").value(1))
-                .andExpect(jsonPath("$.sessions[0].subjectName").value("Banco de Dados"));
+                .andExpect(jsonPath("$.sessions.length()").value(2))
+                .andExpect(jsonPath("$.sessions[0].subjectName").value("Banco de Dados"))
+                .andExpect(jsonPath("$.sessions[1].subjectName").value("Banco de Dados"));
     }
 
     @Test
