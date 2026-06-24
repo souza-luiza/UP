@@ -20,7 +20,7 @@ export default function Home() {
 
       </header>
 
-      <main className="flex flex-col items-center gap-5 self-stretch">
+      <main className="flex flex-col items-center gap-5 p-5 self-stretch">
 
         <h1 className="text-h1 text-black font-semibold">UP: Universidade e Planejamento</h1>
 
@@ -35,19 +35,13 @@ export default function Home() {
 
       </main>
 
-      <div className="flex flex-col justify-center items-center self-stretch gap-5">
-
-        <h2 className="text-h2 text-black font-semibold">Conheça as ferramentas disponíveis no site</h2>
-
         {/*Cards*/}
-        <div className="flex justify-center items-stretch px-5 gap-6 md:gap-[45px] flex-col md:flex-row self-stretch">
+        <div className="flex justify-between items-stretch gap-6 p-5 md:p-1 md:px-20 flex-col md:flex-row self-stretch">
           <Card variant={"cronograma"} />
           <Card variant={"disciplinas"} />
           <Card variant={"disponibilidade"} />
           <Card variant={"flashcards"} />
         </div>
-
-      </div>
 
       <footer className="bg-primary w-full text-center p-2">
         <p className="text-p text-black font-light">© 2026 UP. Todos os direitos reservados.</p>
