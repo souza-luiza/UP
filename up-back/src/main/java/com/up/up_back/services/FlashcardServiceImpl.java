@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,5 +28,17 @@ public class FlashcardServiceImpl implements FlashcardService {
                 .build();
 
         return flashcardRepository.save(flashcard);
+    }
+
+    @Override
+    public List<Flashcard> findAllByUser(User user) {
+
+        return flashcardRepository.findByUser(user);
+    }
+
+    @Override
+    public List<Flashcard> findCardsDueForReview(User user) {
+
+        return flashcardRepository.findByUserAndNextReviewDateLessThanEqual(user, LocalDate.now());
     }
 }
