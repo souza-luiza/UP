@@ -71,4 +71,10 @@ public class FlashcardController {
         return toResponse(flashcard);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        flashcardService.delete(id, userDetails.getUser());
+    }
+
 }

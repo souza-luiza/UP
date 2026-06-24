@@ -21,8 +21,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -232,5 +231,37 @@ public class FlashcardControllerIntegrationTest {
                                 .content(objectMapper.writeValueAsString(dto))
                 )
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldDeleteFlashcardSuccessfully() throws Exception {
+
+        User user = User.builder()
+                .name("Delete")
+                .email("delete@gmail.com")
+                .password(passwordEncoder.encode("123456"))
+                .build();
+
+        userRepository.save(user);
+
+        Flashcard flashcard = flashcardRepository.save(
+                        Flashcard.builder()
+                                .question("Pergunta")
+                                .answer("Resposta")
+                                .reviewLevel(0)
+                                .nextReviewDate(
+                                        LocalDate.now()
+                                )
+                                .user(user)
+                                .build()
+                );
+
+        String token =jwtService.generateAccessToken(user.getEmail());
+
+        mockMvc.perform(
+                        delete("/flashcards/" + flashcard.getId())
+                                .header("Authorization","Bearer " + token)
+                )
+                .andExpect(status().isOk());
     }
 }
