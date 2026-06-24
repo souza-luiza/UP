@@ -8,16 +8,17 @@
 
   --font-sans: var(--font-poppins), sans-serif;
 
-  --text-b1: 16px;
+  --text-p: 16px;
   --text-h1: 36px;
   --text-h2: 32px;
   --text-h3: 24px;
   --text-h4: 20px;
   --text-h5: 18px;
 
-  --weight-regular: 400;
-  --weight-semibold: 500;
-  --weight-bold: 700;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 500;
+  --font-weight-bold: 700;
 
   --radius-none: 0px;
   --radius-sm-custom: 4px;
