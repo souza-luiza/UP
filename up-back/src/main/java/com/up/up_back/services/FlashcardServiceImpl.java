@@ -4,6 +4,7 @@ import com.up.up_back.domain.ReviewResult;
 import com.up.up_back.dto.flashcard.CreateFlashcardDto;
 import com.up.up_back.entity.Flashcard;
 import com.up.up_back.entity.User;
+import com.up.up_back.exception.ForbiddenException;
 import com.up.up_back.repository.FlashcardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class FlashcardServiceImpl implements FlashcardService {
                         );
 
         if (!flashcard.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("You do not own this flashcard");
+            throw new ForbiddenException("You do not own this flashcard");
         }
 
         ReviewResult result = flashcardReviewService.review(flashcard.getReviewLevel(), correct);

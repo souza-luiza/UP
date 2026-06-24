@@ -2,6 +2,7 @@ package com.up.up_back.controller;
 
 import com.up.up_back.dto.flashcard.CreateFlashcardDto;
 import com.up.up_back.dto.flashcard.FlashcardResponseDto;
+import com.up.up_back.dto.flashcard.ReviewFlashcardDto;
 import com.up.up_back.entity.Flashcard;
 import com.up.up_back.entity.User;
 import com.up.up_back.security.UserDetailsImpl;
@@ -60,6 +61,14 @@ public class FlashcardController {
                 .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    @PostMapping("/{id}/review")
+    public FlashcardResponseDto review(@PathVariable Long id, @RequestBody ReviewFlashcardDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        Flashcard flashcard = flashcardService.review(id, dto.correct(), userDetails.getUser());
+
+        return toResponse(flashcard);
     }
 
 }

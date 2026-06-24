@@ -1,11 +1,10 @@
 package com.up.up_back.integration;
 
 import com.up.up_back.dto.flashcard.CreateFlashcardDto;
+import com.up.up_back.dto.flashcard.ReviewFlashcardDto;
 import com.up.up_back.entity.Flashcard;
 import com.up.up_back.entity.User;
-import com.up.up_back.repository.AvailabilityRepository;
 import com.up.up_back.repository.FlashcardRepository;
-import com.up.up_back.repository.SubjectRepository;
 import com.up.up_back.repository.UserRepository;
 import com.up.up_back.security.JwtService;
 import org.junit.jupiter.api.Test;
@@ -154,6 +153,83 @@ public class FlashcardControllerIntegrationTest {
 
         mockMvc.perform(
                         get("/flashcards")
+                )
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReviewFlashcardSuccessfully() throws Exception {
+
+        User user = User.builder()
+                .name("Review")
+                .email("review@gmail.com")
+                .password(passwordEncoder.encode("123456"))
+                .build();
+
+        userRepository.save(user);
+
+        String token = jwtService.generateAccessToken(user.getEmail());
+
+        Flashcard flashcard = flashcardRepository.save(
+                Flashcard.builder()
+                        .question("Pergunta")
+                        .answer("Resposta")
+                        .reviewLevel(0)
+                        .nextReviewDate(LocalDate.now())
+                        .user(user)
+                        .build()
+        );
+
+        ReviewFlashcardDto dto = new ReviewFlashcardDto(true);
+
+        mockMvc.perform(
+                        post("/flashcards/" + flashcard.getId() + "/review")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reviewLevel").value(1));
+    }
+
+    @Test
+    void shouldNotAllowReviewingAnotherUsersFlashcard() throws Exception {
+
+        User owner = User.builder()
+                .name("Owner")
+                .email("owner@gmail.com")
+                .password(passwordEncoder.encode("123456"))
+                .build();
+
+        userRepository.save(owner);
+
+        User attacker = User.builder()
+                .name("Attacker")
+                .email("attacker@gmail.com")
+                .password(passwordEncoder.encode("123456"))
+                .build();
+
+        userRepository.save(attacker);
+
+        Flashcard flashcard = flashcardRepository.save(
+                Flashcard.builder()
+                        .question("Pergunta")
+                        .answer("Resposta")
+                        .reviewLevel(0)
+                        .nextReviewDate(LocalDate.now())
+                        .user(owner)
+                        .build()
+        );
+
+        String token = jwtService.generateAccessToken(attacker.getEmail());
+
+        ReviewFlashcardDto dto = new ReviewFlashcardDto(true);
+
+        mockMvc.perform(
+                        post("/flashcards/" + flashcard.getId() + "/review")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
                 )
                 .andExpect(status().isForbidden());
     }
