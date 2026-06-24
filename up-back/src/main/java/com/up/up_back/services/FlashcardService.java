@@ -15,4 +15,6 @@ public interface FlashcardService {
     List<Flashcard> findCardsDueForReview(User user);
 
     Flashcard review(Long flashcardId, boolean correct, User user);
+
+    void delete(Long flashcardId, User user);
 }

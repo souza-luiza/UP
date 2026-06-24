@@ -4,6 +4,7 @@ import com.up.up_back.domain.ReviewResult;
 import com.up.up_back.dto.flashcard.CreateFlashcardDto;
 import com.up.up_back.entity.Flashcard;
 import com.up.up_back.entity.User;
+import com.up.up_back.exception.ForbiddenException;
 import com.up.up_back.repository.FlashcardRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -173,8 +175,51 @@ class FlashcardServiceTest {
         when(flashcardRepository.findById(1L)).thenReturn(Optional.of(flashcard));
 
         assertThrows(
-                RuntimeException.class,
+                ForbiddenException.class,
                 () -> flashcardService.review(1L, true, attacker)
+        );
+    }
+
+    @Test
+    void shouldDeleteFlashcardSuccessfully() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        Flashcard flashcard = Flashcard.builder()
+                .id(1L)
+                .user(user)
+                .build();
+
+        when(flashcardRepository.findById(1L)).thenReturn(Optional.of(flashcard));
+
+        flashcardService.delete(1L, user);
+
+        verify(flashcardRepository).delete(flashcard);
+    }
+
+    @Test
+    void shouldNotDeleteAnotherUsersFlashcard() {
+
+        User owner = User.builder()
+                .id(1L)
+                .build();
+
+        User attacker = User.builder()
+                .id(2L)
+                .build();
+
+        Flashcard flashcard = Flashcard.builder()
+                .id(1L)
+                .user(owner)
+                .build();
+
+        when(flashcardRepository.findById(1L)).thenReturn(Optional.of(flashcard));
+
+        assertThrows(
+                ForbiddenException.class,
+                () -> flashcardService.delete(1L, attacker)
         );
     }
 }

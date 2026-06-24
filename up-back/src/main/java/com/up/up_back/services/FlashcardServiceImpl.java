@@ -66,4 +66,17 @@ public class FlashcardServiceImpl implements FlashcardService {
 
         return flashcardRepository.save(flashcard);
     }
+
+    @Override
+    public void delete(Long flashcardId, User user) {
+
+        Flashcard flashcard = flashcardRepository.findById(flashcardId)
+                .orElseThrow(() -> new RuntimeException("Flashcard not found"));
+
+        if(!flashcard.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException("You do not own this flashcard");
+        }
+
+        flashcardRepository.delete(flashcard);
+    }
 }
