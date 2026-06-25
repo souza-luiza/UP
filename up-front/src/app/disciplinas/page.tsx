@@ -20,7 +20,7 @@ export default function Disciplinas() {
     const [rating, setRating] = useState<number | undefined>(undefined);
     const [subjects, setSubjects] = useState<Subject[]>([]);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!rating) return;
         try {
