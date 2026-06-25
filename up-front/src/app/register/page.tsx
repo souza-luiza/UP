@@ -9,7 +9,6 @@ import Key from "../components/Icons/KeyIcon";
 import EyeClosed from "../components/Icons/EyeClosedIcon";
 import EyeOpen from "../components/Icons/EyeOpenIcon";
 
-
 export default function RegisterPage() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
@@ -17,13 +16,20 @@ export default function RegisterPage() {
     const [confirmarSenha, setConfirmarSenha] = useState("");
     const [mostrarSenha, setMostrarSenha] = useState(false);
     const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
+    
+    const [erro, setErro] = useState("");
 
-    function handleCadastrar(e: React.FormEvent) {
+    function handleCadastrar(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
+        
+        setErro("");
+
         if (senha !== confirmarSenha) {
-            alert("As senhas não coincidem.");
+            setErro("As senhas não coincidem.");
             return;
         }
+        
+        // CHAMA PARA API AQUI
         console.log({ nome, email, senha });
     }
 
@@ -31,7 +37,6 @@ export default function RegisterPage() {
 
     return (
         <div className="flex min-h-screen flex-col justify-between">
-
             <header className="flex w-full bg-primary py-1.5 px-1 md:px-20 justify-between items-center">
                 <Logo primaryColor={false} />
                 <Button variant="outline" href="/">Voltar</Button>
@@ -39,10 +44,9 @@ export default function RegisterPage() {
 
             <main className="flex flex-1 items-center justify-center">
                 <div className="bg-primary rounded-lg p-8 w-full max-w-sm">
-
                     <h1 className="text-h2 font-semibold text-center text-black mb-1">Cadastro</h1>
                     <p className="text-p font-regular text-black text-center mb-4">
-                        Faça login para acessar sua conta
+                        Crie sua conta para acessar a plataforma
                     </p>
 
                     <form onSubmit={handleCadastrar} className="flex flex-col gap-3">
@@ -85,7 +89,7 @@ export default function RegisterPage() {
                             <div className="relative">
                                 <input
                                     type={mostrarSenha ? "text" : "password"}
-                                    placeholder="Escreva aqui o sua senha"
+                                    placeholder="Escreva aqui a sua senha"
                                     value={senha}
                                     onChange={(e) => setSenha(e.target.value)}
                                     required
@@ -95,7 +99,6 @@ export default function RegisterPage() {
                                     type="button"
                                     onClick={() => setMostrarSenha(!mostrarSenha)}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-black/60 hover:text-secondary-dark/80 transition"
-                                    aria-label={mostrarSenha ? "Esconder senha" : "Mostrar senha"}
                                 >
                                     {mostrarSenha ? <EyeClosed primaryColor={false} /> : <EyeOpen primaryColor={false} />}
                                 </button>
@@ -110,35 +113,39 @@ export default function RegisterPage() {
                             <div className="relative">
                                 <input
                                     type={mostrarConfirmar ? "text" : "password"}
-                                    placeholder="Escreva aqui o sua senha"
+                                    placeholder="Confirme a sua senha"
                                     value={confirmarSenha}
                                     onChange={(e) => setConfirmarSenha(e.target.value)}
                                     required
-                                    className={`${inputClass} pr-10`}
+                                    className={`${inputClass} pr-10 ${erro ? 'border-red-500/50 focus:ring-red-500/40' : ''}`}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-black/60 hover:text-secondary-dark/80 transition"
-                                    aria-label={mostrarConfirmar ? "Esconder senha" : "Mostrar confirmação de senha"}
                                 >
                                     {mostrarConfirmar ? <EyeClosed primaryColor={false} /> : <EyeOpen primaryColor={false} />}
                                 </button>
                             </div>
+                            
+                            {erro && (
+                                <span className="text-xs font-semibold text-red-600 mt-0.5 animate-fadeIn">
+                                    {erro}
+                                </span>
+                            )}
                         </div>
 
-                        <div className="flex justify-between">
-                            <span className="text-sm font-regular text-black/70 text-sm">Esqueceu a senha?</span>
-                            <a href="/login" className="text-sm font-regular text-black/70 text-sm hover:underline">
+                        <div className="flex justify-end">
+                            <a href="/login" className="text-sm font-regular text-black/70 hover:underline">
                                 Já possui cadastro?
                             </a>
                         </div>
 
-                        <div className="flex gap-3 mt-1">
-                            <Button variant="outline" href="/" className="flex-1">
+                        <div className="flex gap-3 mt-1 w-full">
+                            <Button variant="outline" href="/" className="w-1/3">
                                 Voltar
                             </Button>
-                            <Button variant="secondary" href="/login" className="flex-2">
+                            <Button type="submit" variant="secondary" className="w-2/3">
                                 Cadastrar
                             </Button>
                         </div>
