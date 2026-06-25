@@ -300,3 +300,17 @@ export async function deleteAvailability(id: number) {
     }
 
 }
+
+export async function deleteFlashcard(id: number) {
+    const response = await fetch(
+        `http://localhost:8080/flashcards/${id}`,
+        {
+            method: "DELETE",
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao excluir flashcard");
+    }
+}
