@@ -8,13 +8,12 @@ import com.up.up_back.services.AvailabilityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("availabilities")
+@RequestMapping("/availabilities")
 @RequiredArgsConstructor
 public class AvailabilityController {
 
@@ -26,5 +25,23 @@ public class AvailabilityController {
         Availability availability = availabilityService.create(dto, userDetails.getUser());
 
         return new AvailabilityResponseDto(availability.getId(), availability.getDayOfWeek(), availability.getStartTime(), availability.getEndTime());
+    }
+
+    @GetMapping
+    public List<AvailabilityResponseDto> findAll(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+
+        return availabilityService.findAll(userDetails.getUser())
+                .stream()
+                .map(availability ->
+                        new AvailabilityResponseDto(
+                                availability.getId(),
+                                availability.getDayOfWeek(),
+                                availability.getStartTime(),
+                                availability.getEndTime()
+                        )
+                )
+                .toList();
     }
 }

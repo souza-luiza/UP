@@ -7,6 +7,8 @@ import com.up.up_back.repository.AvailabilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AvailabilityServiceImpl implements AvailabilityService {
@@ -26,6 +28,11 @@ public class AvailabilityServiceImpl implements AvailabilityService {
                 .build();
 
         return availabilityRepository.save(availability);
+    }
+
+    @Override
+    public List<Availability> findAll(User user) {
+        return availabilityRepository.findByUser(user);
     }
 
 }
