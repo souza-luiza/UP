@@ -34,6 +34,8 @@ public class AuthService {
         boolean passwordMatches = passwordEncoder.matches(dto.password(), user.getPassword());
         if(!passwordMatches) throw new InvalidCredentialsException("Invalid credentials");
 
+        refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
+
         String accessToken = jwtService.generateAccessToken(user.getEmail());
         String refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
