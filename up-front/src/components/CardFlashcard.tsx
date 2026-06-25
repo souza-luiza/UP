@@ -28,7 +28,7 @@ export default function CardFlashcard({ question, answer, level, onDelete }: Car
                 {onDelete && (
                     <button 
                         onClick={onDelete}
-                        className="text-xs font-semibold text-red-600 hover:text-red-700 hover:underline cursor-pointer outline-none"
+                        className="text-xs font-semibold text-red-700 hover:text-red-800 hover:underline cursor-pointer outline-none"
                     >
                         Excluir
                     </button>
