@@ -1,5 +1,7 @@
 "use client";
 
+import { login } from "@/services/api";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AtSign from "../components/Icons/AtSignIcon";
 import Key from "../components/Icons/KeyIcon";
@@ -12,12 +14,29 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
     const [mostrarSenha, setMostrarSenha] = useState(false);
+    const router = useRouter();
 
-    function handleEntrar(e: React.SubmitEvent<HTMLFormElement>) {
+    async function handleEntrar(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         
-        // CHAMA PARA API AQUI
-        console.log({ email, senha });
+        try {
+            const data = await login(
+                email,
+                senha
+            );
+
+            localStorage.setItem(
+                "accessToken",
+                data.accessToken
+            );
+
+            router.push("/perfil");
+
+        } catch {
+
+            alert("E-mail ou senha inválidos.");
+
+        }
     }
 
     const inputClass = "w-full px-3 py-2 rounded-md bg-white/30 border border-black/20 text-p text-black placeholder:text-black/50 focus:outline-none focus:ring-1 focus:ring-black/40";
