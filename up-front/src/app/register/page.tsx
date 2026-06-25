@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import Logo from "../components/Logo";
-import UserIcon from "../components/UserIcon";
+import UserIcon from "../components/Icons/UserIcon";
 import Button from "../components/Button";
-import AtSign from "../components/AtSignIcon";
-import Key from "../components/KeyIcon";
-import EyeClosed from "../components/EyeClosedIcon";
-import EyeOpen from "../components/EyeOpenIcon";
+import AtSign from "../components/Icons/AtSignIcon";
+import Key from "../components/Icons/KeyIcon";
+import EyeClosed from "../components/Icons/EyeClosedIcon";
+import EyeOpen from "../components/Icons/EyeOpenIcon";
 
 
 export default function RegisterPage() {
