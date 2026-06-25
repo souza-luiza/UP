@@ -269,3 +269,18 @@ export async function logout() {
     }
 
 }
+
+export async function deleteSubject(id: number) {
+
+    const response = await fetch(
+        `http://localhost:8080/subjects/${id}`,
+        {
+            method: "DELETE",
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao excluir disciplina");
+    }
+}
