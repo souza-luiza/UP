@@ -6,12 +6,9 @@
   --color-primary: #B39EB5;
   --color-secondary: #ADEBB3;
   --color-secondary-dark: #5C4F5E;
-  --color-background-ligth: #F5EEF5;
 
   --font-sans: var(--font-poppins), sans-serif;
 
-  --text-xs: 12px;
-  --text-sm: 14px;
   --text-p: 16px;
   --text-h1: 36px;
   --text-h2: 32px;
