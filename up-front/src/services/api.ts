@@ -191,3 +191,42 @@ export async function createFlashcard(
 
     return response.json();
 }
+
+export async function getFlashcardsForReview() {
+
+    const response = await fetch(
+        "http://localhost:8080/flashcards/review",
+        {
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao buscar revisões");
+    }
+
+    return response.json();
+}
+
+export async function reviewFlashcard(
+    id: number,
+    correct: boolean
+) {
+
+    const response = await fetch(
+        `http://localhost:8080/flashcards/${id}/review`,
+        {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                correct
+            })
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao revisar flashcard");
+    }
+
+    return response.json();
+}

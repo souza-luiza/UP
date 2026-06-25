@@ -2,29 +2,74 @@
 
 import Button from "@/components/Button";
 import Logo from "@/components/Logo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+    getFlashcardsForReview,
+    reviewFlashcard
+} from "@/services/api";
+
+type Flashcard = {
+    id: number;
+    question: string;
+    answer: string;
+    reviewLevel: number;
+    nextReviewDate: string;
+};
 
 export default function RevisaoFlashcards() {
     const [showAnswer, setShowAnswer] = useState(false);
 
-    // Dados de exemplo do flashcard atual
-    const currentFlashcard = {
-        question: "O que é encapsulamento?",
-        answer: "Ocultar detalhes internos de um objeto."
-    };
+    const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
 
-    const handleAnswerAction = (success: boolean) => {
-        if (success) {
-            // CHAMA A API PARA SUBIR O NÍVEL DO CARD (Acertei)
-            console.log("Usuário acertou!");
-        } else {
-            // CHAMA A API PARA ZERAR OU DIMINUIR O NÍVEL (Errei)
-            console.log("Usuário errou!");
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const handleAnswerAction =
+        async (correct: boolean) => {
+
+            if (!currentFlashcard) return;
+
+            try {
+
+                await reviewFlashcard(
+                    currentFlashcard.id,
+                    correct
+                );
+
+                setShowAnswer(false);
+
+                setCurrentIndex(
+                    current => current + 1
+                );
+
+            } catch {
+
+                alert("Erro ao revisar flashcard");
+
+            }
+        };
+
+    async function loadReviews() {
+
+        try {
+
+            const data =
+                await getFlashcardsForReview();
+
+            setFlashcards(data);
+
+        } catch {
+
+            alert("Erro ao carregar revisões");
+
         }
-        
-        // Reseta o estado para o próximo flashcard vir oculto
-        setShowAnswer(false);
-    };
+
+    }
+
+    useEffect(() => {
+        loadReviews();
+    }, []);
+
+    const currentFlashcard = flashcards[currentIndex];
 
     return (
         <div className="flex min-h-screen flex-col">
