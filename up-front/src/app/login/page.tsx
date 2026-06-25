@@ -13,10 +13,14 @@ export default function LoginPage() {
     const [senha, setSenha] = useState("");
     const [mostrarSenha, setMostrarSenha] = useState(false);
 
-    function handleEntrar(e: React.FormEvent) {
+    function handleEntrar(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
+        
+        // CHAMA PARA API AQUI
         console.log({ email, senha });
     }
+
+    const inputClass = "w-full px-3 py-2 rounded-md bg-white/30 border border-black/20 text-p text-black placeholder:text-black/50 focus:outline-none focus:ring-1 focus:ring-black/40";
 
     return (
         <div className="flex min-h-screen flex-col justify-between">
@@ -49,7 +53,7 @@ export default function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="w-full px-3 py-2 rounded-md bg-white/30 border border-black/20 text-p text-black placeholder:text-black/50 focus:outline-none focus:ring-1 focus:ring-black/40"
+                                className={inputClass}
                             />
                         </div>
 
@@ -61,11 +65,11 @@ export default function LoginPage() {
                             <div className="relative">
                                 <input
                                     type={mostrarSenha ? "text" : "password"}
-                                    placeholder="Escreva aqui o sua senha"
+                                    placeholder="Escreva aqui a sua senha"
                                     value={senha}
                                     onChange={(e) => setSenha(e.target.value)}
                                     required
-                                    className="w-full px-3 py-2 pr-10 rounded-md bg-white/30 border border-black/20 text-p text-black placeholder:text-black/50 focus:outline-none focus:ring-1 focus:ring-black/40"
+                                    className={`${inputClass} pr-10`}
                                 />
                                 <button
                                     type="button"
@@ -79,17 +83,19 @@ export default function LoginPage() {
                         </div>
 
                         <div className="flex justify-between">
-                            <span className="text-sm font-regular text-black/70 text-sm">Esqueceu a senha?</span>
-                            <a href="/register" className="text-sm font-regular text-black/70 text-sm hover:underline">
+                            <a href="/recuperar-senha" className="text-sm font-regular text-black/70 hover:underline cursor-pointer">
+                                Esqueceu a senha?
+                            </a>
+                            <a href="/register" className="text-sm font-regular text-black/70 hover:underline">
                                 Não tem cadastro?
                             </a>
                         </div>
 
-                        <div className="flex gap-3 mt-1">
-                            <Button variant="outline" href="/" className="flex-1">
+                        <div className="flex gap-3 mt-1 w-full">
+                            <Button variant="outline" href="/" className="w-1/3">
                                 Voltar
                             </Button>
-                            <Button variant="secondary" href="/login" className="flex-2">
+                            <Button type="submit" variant="secondary" className="w-2/3">
                                 Entrar
                             </Button>
                         </div>
