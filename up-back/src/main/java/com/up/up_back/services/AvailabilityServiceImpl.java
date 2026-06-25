@@ -4,7 +4,9 @@ import com.up.up_back.dto.availability.CreateAvailabilityDto;
 import com.up.up_back.entity.Availability;
 import com.up.up_back.entity.User;
 import com.up.up_back.repository.AvailabilityRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,4 +37,17 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         return availabilityRepository.findByUser(user);
     }
 
+    @Override
+    @Transactional
+    public void delete(Long id, User user) {
+
+        Availability availability = availabilityRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Subject not found."));
+
+        if (!availability.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You can't delete this subject.");
+        }
+
+        availabilityRepository.delete(availability);
+    }
 }
