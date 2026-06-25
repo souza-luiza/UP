@@ -97,3 +97,43 @@ export async function createSubject(
 
     return response.json();
 }
+
+export async function getAvailabilities() {
+    const response = await fetch(
+        "http://localhost:8080/availabilities",
+        {
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao buscar disponibilidades");
+    }
+
+    return response.json();
+}
+
+export async function createAvailability(
+    dayOfWeek: string,
+    startTime: string,
+    endTime: string
+) {
+    const response = await fetch(
+        "http://localhost:8080/availabilities",
+        {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                dayOfWeek,
+                startTime,
+                endTime
+            })
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao criar disponibilidade");
+    }
+
+    return response.json();
+}

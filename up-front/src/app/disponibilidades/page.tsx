@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {createAvailability, getAvailabilities} from "@/services/api";
 import Button from "../../components/Button";
 import Logo from "../../components/Logo";
 import SelectInput from "../../components/SelectInput";
 import TimeInput from "../../components/TimeInput";
 import CardDisponibilidade from "../../components/CardDisponibilidade";
 
+type Availability = {
+    id: number;
+    dayOfWeek: string;
+    startTime: string;
+    endTime: string;
+};
+
 export default function Disponibilidades() {
     const [dayOfWeek, setDayOfWeek] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
+    const [availabilities, setAvailabilities] = useState<Availability[]>([]);
 
     const diasDaSemana = [
         { value: "MONDAY", label: "Segunda-feira" },
@@ -22,10 +31,61 @@ export default function Disponibilidades() {
         { value: "SUNDAY", label: "Domingo" },
     ];
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    function translateDay(day: string) {
+
+        const days: Record<string, string> = {
+            MONDAY: "Segunda-feira",
+            TUESDAY: "Terça-feira",
+            WEDNESDAY: "Quarta-feira",
+            THURSDAY: "Quinta-feira",
+            FRIDAY: "Sexta-feira",
+            SATURDAY: "Sábado",
+            SUNDAY: "Domingo"
+        };
+
+        return days[day] ?? day;
+    }
+
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // CHAMA PARA API
+        try {
+
+            await createAvailability(
+                dayOfWeek,
+                startTime,
+                endTime
+            );
+
+            setDayOfWeek("");
+            setStartTime("");
+            setEndTime("");
+
+            await loadAvailabilities();
+
+        } catch {
+
+            alert("Erro ao cadastrar disponibilidade.");
+
+        }
     };
+
+    async function loadAvailabilities() {
+        try {
+
+            const data = await getAvailabilities();
+
+            setAvailabilities(data);
+
+        } catch {
+
+            console.error("Erro ao carregar disponibilidades");
+
+        }
+    }
+
+    useEffect(() => {
+        loadAvailabilities();
+    }, []);
 
     return(
         <div className="flex min-h-screen flex-col">
@@ -83,8 +143,15 @@ export default function Disponibilidades() {
 
                 <h4 className="text-h4 text-black font-semibold">Disponibilidades cadastradas</h4>
                 <div className="flex flex-wrap items-stretch gap-6 flex-col md:flex-row self-stretch">
-                    <CardDisponibilidade dayOfWeek={"Segunda"} startTime={"14:00"} endTime={"18:00"} onDelete={() => console.log("deletar")} />
-                    <CardDisponibilidade dayOfWeek={"Terça"} startTime={"14:00"} endTime={"18:00"} onDelete={() => console.log("deletar")} />
+                    {availabilities.map((availability) => (
+                        <CardDisponibilidade
+                            key={availability.id}
+                            dayOfWeek={translateDay(availability.dayOfWeek)}
+                            startTime={availability.startTime}
+                            endTime={availability.endTime}
+                            onDelete={() => console.log("deletar")}
+                        />
+                    ))}
                 </div>
 
             </main>
