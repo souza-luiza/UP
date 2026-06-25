@@ -43,6 +43,7 @@ export async function login(
         "http://localhost:8080/auth/login",
         {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -229,4 +230,42 @@ export async function reviewFlashcard(
     }
 
     return response.json();
+}
+
+export async function getMe() {
+
+    const response = await fetch(
+        "http://localhost:8080/users/me",
+        {
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao buscar usuário");
+    }
+
+    return response.json();
+}
+
+export async function logout() {
+
+    try {
+
+        await fetch(
+            "http://localhost:8080/auth/logout",
+            {
+                method: "POST",
+                credentials: "include"
+            }
+        );
+
+    } finally {
+
+        localStorage.removeItem("accessToken");
+
+        window.location.href = "/login";
+
+    }
+
 }
