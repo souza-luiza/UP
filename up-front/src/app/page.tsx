@@ -1,6 +1,6 @@
-import Button from "./components/Button";
-import Card from "./components/Card";
-import Logo from "./components/Logo";
+import Button from "../components/Button";
+import Card from "../components/Card";
+import Logo from "../components/Logo";
 
 export default function Home() {
   return (

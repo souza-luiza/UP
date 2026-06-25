@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Button from "../components/Button";
-import Logo from "../components/Logo";
-import SelectInput from "../components/SelectInput";
-import TimeInput from "../components/TimeInput";
-import CardDisponibilidade from "../components/CardDisponibilidade";
+import Button from "../../components/Button";
+import Logo from "../../components/Logo";
+import SelectInput from "../../components/SelectInput";
+import TimeInput from "../../components/TimeInput";
+import CardDisponibilidade from "../../components/CardDisponibilidade";
 
 export default function Disponibilidades() {
     const [dayOfWeek, setDayOfWeek] = useState("");

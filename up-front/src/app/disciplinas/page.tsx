@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Button from "../components/Button";
-import Logo from "../components/Logo";
-import TextInput from "../components/TextInput";
-import RadioInput from "../components/RadioInput";
-import CardDisciplinas from "../components/CardDisciplinas";
+import Button from "../../components/Button";
+import Logo from "../../components/Logo";
+import TextInput from "../../components/TextInput";
+import RadioInput from "../../components/RadioInput";
+import CardDisciplinas from "../../components/CardDisciplinas";
 
 export default function Disciplinas() {
     const [name, setName] = useState('');
