@@ -9,7 +9,12 @@ import EyeOpen from "../components/Icons/EyeOpenIcon";
 import Button from "@/components/Button";
 import Logo from "@/components/Logo";
 
+import { register } from "@/services/api";
+import { useRouter } from "next/navigation";
+
 export default function RegisterPage() {
+    const router = useRouter();
+
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
@@ -19,7 +24,7 @@ export default function RegisterPage() {
     
     const [erro, setErro] = useState("");
 
-    function handleCadastrar(e: React.SubmitEvent<HTMLFormElement>) {
+    async function handleCadastrar(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         
         setErro("");
@@ -29,8 +34,21 @@ export default function RegisterPage() {
             return;
         }
         
-        // CHAMA PARA API AQUI
-        console.log({ nome, email, senha });
+        try {
+
+            await register(
+                nome,
+                email,
+                senha
+            );
+
+            router.push("/login");
+
+        } catch {
+
+            setErro("Não foi possível realizar o cadastro.");
+
+        }
     }
 
     const inputClass = "w-full px-3 py-2 rounded-md bg-white/30 border border-black/20 text-p text-black placeholder:text-black/50 focus:outline-none focus:ring-1 focus:ring-black/40";
