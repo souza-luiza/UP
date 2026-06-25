@@ -8,10 +8,9 @@ import com.up.up_back.services.SubjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/subjects")
@@ -27,4 +26,21 @@ public class SubjectController {
 
         return new SubjectResponseDto(subject.getId(), subject.getName(), subject.getDifficulty());
     }
+
+    @GetMapping
+    public List<SubjectResponseDto> findAll(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+
+        return subjectService.findAll(userDetails.getUser())
+                .stream()
+                .map(subject -> new SubjectResponseDto(
+                        subject.getId(),
+                        subject.getName(),
+                        subject.getDifficulty()
+                ))
+                .toList();
+    }
+
+
 }

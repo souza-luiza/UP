@@ -7,6 +7,8 @@ import com.up.up_back.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SubjectServiceImpl implements SubjectService {
@@ -23,6 +25,11 @@ public class SubjectServiceImpl implements SubjectService {
                 .build();
 
         return subjectRepository.save(subject);
+    }
+
+    @Override
+    public List<Subject> findAll(User user) {
+        return subjectRepository.findByUser(user);
     }
 
 }
