@@ -10,10 +10,10 @@ export default function Home() {
         <Logo primaryColor={false}/>
 
         <nav className="flex gap-4 items-center">
-          <Button variant="secondary">
+          <Button variant="outline" href="/register">
             Cadastrar
           </Button>
-          <Button variant="outline">
+          <Button variant="secondary" href="/login"> 
             Acessar conta
           </Button>
         </nav>
