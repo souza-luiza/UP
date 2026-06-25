@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Logo from "../components/Logo";
 import UserIcon from "../components/Icons/UserIcon";
-import Button from "../components/Button";
 import AtSign from "../components/Icons/AtSignIcon";
 import Key from "../components/Icons/KeyIcon";
 import EyeClosed from "../components/Icons/EyeClosedIcon";
 import EyeOpen from "../components/Icons/EyeOpenIcon";
+import Button from "@/components/Button";
+import Logo from "@/components/Logo";
 
 export default function RegisterPage() {
     const [nome, setNome] = useState("");

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Logo from "../components/Logo";
-import Button from "../components/Button";
 import AtSign from "../components/Icons/AtSignIcon";
 import Key from "../components/Icons/KeyIcon";
 import EyeClosed from "../components/Icons/EyeClosedIcon";
 import EyeOpen from "../components/Icons/EyeOpenIcon";
+import Button from "@/components/Button";
+import Logo from "@/components/Logo";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
