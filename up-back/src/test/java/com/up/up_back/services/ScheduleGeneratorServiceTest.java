@@ -292,4 +292,35 @@ class ScheduleGeneratorServiceTest {
                         List.of()
                 ));
     }
+
+    @Test
+    void shouldNotGenerateOverlappingSessions() {
+        Subject bd = Subject.builder()
+                .name("BD")
+                .difficulty(5)
+                .build();
+
+        Subject poo = Subject.builder()
+                .name("POO")
+                .difficulty(5)
+                .build();
+
+        Availability availability = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(23, 0))
+                .build();
+
+        List<StudySession> sessions = scheduleGeneratorService.generate(
+                List.of(bd, poo),
+                List.of(availability),
+                List.of()
+        );
+
+        for (int i = 0; i < sessions.size() - 1; i++) {
+            assertFalse(
+                    sessions.get(i).end().isAfter(sessions.get(i + 1).start())
+            );
+        }
+    }
 }
