@@ -1,20 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createSubject, getSubjects } from "@/services/api";
 import Button from "../../components/Button";
 import Logo from "../../components/Logo";
 import TextInput from "../../components/TextInput";
 import RadioInput from "../../components/RadioInput";
 import CardDisciplinas from "../../components/CardDisciplinas";
 
+type Subject = {
+    id: number;
+    name: string;
+    difficulty: number;
+};
+
 export default function Disciplinas() {
     const [name, setName] = useState('');
     const [rating, setRating] = useState<number | undefined>(undefined);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // CHAMA PARA API
+        if (!rating) return;
+        try {
+
+            await createSubject(
+                name,
+                rating
+            );
+
+            setName("");
+            setRating(undefined);
+
+            await loadSubjects();
+
+        } catch {
+
+            alert("Erro ao cadastrar disciplina.");
+
+        }
     };
+
+    async function loadSubjects() {
+        try {
+            const data = await getSubjects();
+            setSubjects(data);
+        } catch {
+            console.error("Erro ao carregar disciplinas");
+        }
+    }
+
+    useEffect(() => {
+        loadSubjects();
+    }, []);
 
     return(
         <div className="flex min-h-screen flex-col">
@@ -73,8 +111,13 @@ export default function Disciplinas() {
 
                 <h4 className="text-h4 text-black font-semibold">Disciplinas cadastradas</h4>
                 <div className="flex flex-wrap items-stretch gap-6 flex-col md:flex-row self-stretch">
-                    <CardDisciplinas name={"Banco de Dados"} difficulty={3}/>
-                    <CardDisciplinas name={"POO"} difficulty={3}/>
+                    {subjects.map((subject) => (
+                        <CardDisciplinas
+                            key={subject.id}
+                            name={subject.name}
+                            difficulty={subject.difficulty}
+                        />
+                    ))}
                 </div>
 
 

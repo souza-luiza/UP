@@ -1,5 +1,16 @@
 const API_URL = "http://localhost:8080";
 
+function getToken() {
+    return localStorage.getItem("accessToken");
+}
+
+function authHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getToken()}`
+    };
+}
+
 export async function register(
     name: string,
     email: string,
@@ -44,6 +55,44 @@ export async function login(
 
     if (!response.ok) {
         throw new Error("Credenciais inválidas");
+    }
+
+    return response.json();
+}
+
+export async function getSubjects() {
+    const response = await fetch(
+        "http://localhost:8080/subjects",
+        {
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao buscar disciplinas");
+    }
+
+    return response.json();
+}
+
+export async function createSubject(
+    name: string,
+    difficulty: number
+) {
+    const response = await fetch(
+        "http://localhost:8080/subjects",
+        {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                name,
+                difficulty
+            })
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao criar disciplina");
     }
 
     return response.json();
