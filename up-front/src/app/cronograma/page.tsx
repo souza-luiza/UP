@@ -1,53 +1,74 @@
+"use client";
+
+import { useState } from "react";
 import Button from "../../components/Button";
 import Logo from "../../components/Logo";
 import CardCronograma from "@/components/CardCronograma";
+import { generateSchedule } from "@/services/api";
 
 export default function Cronogramas() {
-    const cronogramaExemplo = [
-        {
-            day: "Segunda-feira",
-            sessions: [
-                { time: "14:00 - 16:00", subject: "Banco de Dados" },
-                { time: "16:00 - 18:00", subject: "POO" }
-            ]
-        },
-        {
-            day: "Terça-feira",
-            sessions: [
-                { time: "08:00 - 10:00", subject: "Estrutura de Dados" }
-            ]
-        },
-        {
-            day: "Quarta-feira",
-            sessions: [
-                { time: "08:00 - 10:00", subject: "Estrutura de Dados" }
-            ]
-        },
-        {
-            day: "Quinta-feira",
-            sessions: [
-                { time: "08:00 - 10:00", subject: "Estrutura de Dados" }
-            ]
-        },
-        {
-            day: "Sexta-feira",
-            sessions: [
-                { time: "08:00 - 10:00", subject: "Estrutura de Dados" }
-            ]
-        },
-        {
-            day: "Sábado",
-            sessions: [
-                { time: "08:00 - 10:00", subject: "Estrutura de Dados" }
-            ]
-        },
-        {
-            day: "Domingo",
-            sessions: [
-                { time: "08:00 - 10:00", subject: "Estrutura de Dados" }
-            ]
+    const [schedule, setSchedule] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    function translateDay(day: string) {
+
+        const days: Record<string, string> = {
+            MONDAY: "Segunda-feira",
+            TUESDAY: "Terça-feira",
+            WEDNESDAY: "Quarta-feira",
+            THURSDAY: "Quinta-feira",
+            FRIDAY: "Sexta-feira",
+            SATURDAY: "Sábado",
+            SUNDAY: "Domingo"
+        };
+
+        return days[day] ?? day;
+    }
+
+    async function handleGenerateSchedule() {
+
+        try {
+
+            setLoading(true);
+
+            const data = await generateSchedule();
+
+            setSchedule(data.sessions);
+
+        } catch (error) {
+
+            alert("Erro ao gerar cronograma");
+
+        } finally {
+
+            setLoading(false);
+
         }
-    ];
+    }
+
+    const groupedSchedule = Object.values(
+        schedule.reduce((acc: any, session: any) => {
+
+            const day = translateDay(session.dayOfWeek);
+
+            if (!acc[day]) {
+
+                acc[day] = {
+                    day,
+                    sessions: []
+                };
+
+            }
+
+            acc[day].sessions.push({
+                time: `${session.start} - ${session.end}`,
+                subject: session.subjectName
+            });
+
+            return acc;
+
+        }, {})
+    );
 
     return(
         <div className="flex min-h-screen flex-col">
@@ -69,24 +90,24 @@ export default function Cronogramas() {
                     Gere automaticamente sessões de estudo com base nas disciplinas e disponibilidades cadastradas.
                 </p>
                 <div>
-                    <Button>
-                        Gerar cronograma
+                    <Button onClick={handleGenerateSchedule}>
+                        {loading ? "Gerando..." : "Gerar cronograma"}
                     </Button>
                 </div>
 
                 <h4 className="text-h4 text-black font-semibold">Resultados</h4>
 
-                {cronogramaExemplo.length === 0 ? (
+                {schedule.length === 0 ? (
                     <p className="text-p">
                         Nenhum cronograma gerado ainda.
                     </p>
                 ) : (
 
                     <div className="flex flex-wrap items-stretch gap-6 flex-col md:flex-row self-stretch">
-                        {cronogramaExemplo.map((item, index) => (
-                            <CardCronograma 
+                        {groupedSchedule.map((item: any, index) => (
+                            <CardCronograma
                                 key={index}
-                                day={item.day ?? ''}
+                                day={item.day}
                                 sessions={item.sessions}
                             />
                         ))}

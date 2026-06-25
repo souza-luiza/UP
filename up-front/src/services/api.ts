@@ -137,3 +137,19 @@ export async function createAvailability(
 
     return response.json();
 }
+
+export async function generateSchedule() {
+    const response = await fetch(
+        "http://localhost:8080/schedule/generate",
+        {
+            method: "POST",
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao gerar cronograma");
+    }
+
+    return response.json();
+}
