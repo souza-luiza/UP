@@ -42,5 +42,12 @@ public class SubjectController {
                 .toList();
     }
 
-
+    @DeleteMapping("/{id}")
+    public void delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        subjectService.delete(id, userDetails.getUser());
+    }
+    
 }
