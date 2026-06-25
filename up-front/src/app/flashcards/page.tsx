@@ -1,23 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {createFlashcard, getFlashcards} from "@/services/api";
 import Button from "../../components/Button";
 import Logo from "../../components/Logo";
 import TextInput from "../../components/TextInput";
 import CardFlashcard from "@/components/CardFlashcard";
 
+type Flashcard = {
+    id: number;
+    question: string;
+    answer: string;
+    reviewLevel: number;
+    nextReviewDate: string;
+};
+
 export default function Flashcards() {
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
+    const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // CHAMA PARA API
+        try {
+
+            await createFlashcard(
+                question,
+                answer
+            );
+
+            setQuestion("");
+            setAnswer("");
+
+            await loadFlashcards();
+
+        } catch {
+
+            alert("Erro ao cadastrar flashcard.");
+
+        }
 
         // Limpa os campos após o envio
         setQuestion('');
         setAnswer('');
     };
+
+    useEffect(() => {
+        loadFlashcards();
+    }, []);
+
+    async function loadFlashcards() {
+
+        try {
+
+            const data = await getFlashcards();
+
+            setFlashcards(data);
+
+        } catch {
+
+            console.error("Erro ao carregar flashcards");
+
+        }
+
+    }
 
     return(
         <div className="flex min-h-screen flex-col">
@@ -72,18 +118,15 @@ export default function Flashcards() {
 
                 <h4 className="text-h4 text-black font-semibold">Flashcards cadastrados</h4>
                 <div className="flex flex-wrap items-stretch gap-6 flex-col md:flex-row self-stretch">
-                    <CardFlashcard 
-                        question="O que é encapsulamento?" 
-                        answer="Ocultar detalhes internos de uma classe e expor apenas o necessário através de métodos públicos."
-                        level={0}
-                        onDelete={() => console.log("Deletar este card")}
-                    />
-                    <CardFlashcard 
-                        question="Qual a diferença entre Let e Const?" 
-                        answer="Let permite reatribuição de valor, enquanto Const cria uma referência imutável."
-                        level={1}
-                        onDelete={() => console.log("Deletar este card")}
-                    />
+                    {flashcards.map((flashcard) => (
+                        <CardFlashcard
+                            key={flashcard.id}
+                            question={flashcard.question}
+                            answer={flashcard.answer}
+                            level={flashcard.reviewLevel}
+                            onDelete={() => console.log("deletar")}
+                        />
+                    ))}
                 </div>
 
 

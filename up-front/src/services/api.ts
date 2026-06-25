@@ -153,3 +153,41 @@ export async function generateSchedule() {
 
     return response.json();
 }
+
+export async function getFlashcards() {
+    const response = await fetch(
+        "http://localhost:8080/flashcards",
+        {
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao buscar flashcards");
+    }
+
+    return response.json();
+}
+
+export async function createFlashcard(
+    question: string,
+    answer: string
+) {
+    const response = await fetch(
+        "http://localhost:8080/flashcards",
+        {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+                question,
+                answer
+            })
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao criar flashcard");
+    }
+
+    return response.json();
+}
