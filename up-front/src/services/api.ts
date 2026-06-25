@@ -284,3 +284,19 @@ export async function deleteSubject(id: number) {
         throw new Error("Erro ao excluir disciplina");
     }
 }
+
+export async function deleteAvailability(id: number) {
+
+    const response = await fetch(
+        `http://localhost:8080/availabilities/${id}`,
+        {
+            method: "DELETE",
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao excluir disponibilidade");
+    }
+
+}
