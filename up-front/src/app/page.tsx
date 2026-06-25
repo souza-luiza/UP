@@ -10,11 +10,11 @@ export default function Home() {
         <Logo primaryColor={false}/>
 
         <nav className="flex gap-4 items-center">
-          <Button variant="outline" href="/register">
-            Cadastrar
-          </Button>
-          <Button variant="secondary" href="/login"> 
+          <Button variant="outline" href="/login"> 
             Acessar conta
+          </Button>
+          <Button variant="secondary" href="/register">
+            Cadastrar
           </Button>
         </nav>
 
@@ -29,7 +29,7 @@ export default function Home() {
           para que você dê um UP na vida acadêmica!
         </p>
 
-        <Button>
+        <Button href="/register">
           Inicie sua jornada
         </Button>
 
