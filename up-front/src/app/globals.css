@@ -8,6 +8,8 @@
 
   --font-sans: var(--font-poppins), sans-serif;
 
+  --text-xs: 12px;
+  --text-sm: 14px;
   --text-p: 16px;
   --text-h1: 36px;
   --text-h2: 32px;
