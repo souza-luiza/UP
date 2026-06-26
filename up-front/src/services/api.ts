@@ -139,13 +139,10 @@ export async function createAvailability(
 }
 
 export async function generateSchedule() {
-    const response = await fetch(
-        `${API_URL}/schedule/generate`,
-        {
-            method: "POST",
-            headers: authHeaders()
-        }
-    );
+    const response = await fetch(`${API_URL}/schedule/generate`, {
+        method: "POST",
+        headers: authHeaders()
+    });
 
     if (!response.ok) {
         throw new Error("Erro ao gerar cronograma");
