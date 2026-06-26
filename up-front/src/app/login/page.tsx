@@ -9,6 +9,7 @@ import EyeClosed from "../components/Icons/EyeClosedIcon";
 import EyeOpen from "../components/Icons/EyeOpenIcon";
 import Button from "@/components/Button";
 import Logo from "@/components/Logo";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -34,7 +35,7 @@ export default function LoginPage() {
 
         } catch {
 
-            alert("E-mail ou senha inválidos.");
+            toast.error("E-mail ou senha inválidos.");
 
         }
     }

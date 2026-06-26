@@ -11,6 +11,7 @@ import Logo from "@/components/Logo";
 
 import { register } from "@/services/api";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -22,31 +23,32 @@ export default function RegisterPage() {
     const [mostrarSenha, setMostrarSenha] = useState(false);
     const [mostrarConfirmar, setMostrarConfirmar] = useState(false);
     
-    const [erro, setErro] = useState("");
+    const [erroSenha, setErroSenha] = useState("");
 
     async function handleCadastrar(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         
-        setErro("");
+        setErroSenha("");
 
         if (senha !== confirmarSenha) {
-            setErro("As senhas não coincidem.");
+            setErroSenha("As senhas não coincidem.");
             return;
         }
         
         try {
-
             await register(
                 nome,
                 email,
                 senha
             );
 
+            toast.success("Cadastro realizado com sucesso!");
+
             router.push("/login");
 
-        } catch {
+        } catch(error) {
 
-            setErro("Não foi possível realizar o cadastro.");
+            toast.error("Não foi possível realizar o cadastro.");
 
         }
     }
@@ -135,7 +137,7 @@ export default function RegisterPage() {
                                     value={confirmarSenha}
                                     onChange={(e) => setConfirmarSenha(e.target.value)}
                                     required
-                                    className={`${inputClass} pr-10 ${erro ? 'border-red-500/50 focus:ring-red-500/40' : ''}`}
+                                    className={`${inputClass} pr-10 ${erroSenha ? 'border-red-500/50 focus:ring-red-500/40' : ''}`}
                                 />
                                 <button
                                     type="button"
@@ -146,9 +148,9 @@ export default function RegisterPage() {
                                 </button>
                             </div>
                             
-                            {erro && (
+                            {erroSenha && (
                                 <span className="text-xs font-semibold text-red-600 mt-0.5 animate-fadeIn">
-                                    {erro}
+                                    {erroSenha}
                                 </span>
                             )}
                         </div>

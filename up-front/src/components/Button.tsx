@@ -15,7 +15,7 @@ export default function Button({ children, className, variant = 'primary', href,
         danger: 'bg-red-700 text-white border-2 border-transparent'
     }[variant];
 
-    const classes = `flex justify-center items-center py-1.5 px-5 rounded-md-custom text-p font-regular transition-all duration-150 ease-in-out ${variantStyles} ${className || ''}`;
+    const classes = `flex justify-center items-center cursor-pointer py-1.5 px-5 rounded-md-custom text-p font-regular transition-all duration-150 ease-in-out ${variantStyles} ${className || ''}`;
 
     if(href) {
         return (
