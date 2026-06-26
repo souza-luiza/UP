@@ -8,6 +8,7 @@ import SelectInput from "../../components/SelectInput";
 import TimeInput from "../../components/TimeInput";
 import CardDisponibilidade from "../../components/CardDisponibilidade";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
 
 type Availability = {
     id: number;
@@ -17,6 +18,9 @@ type Availability = {
 };
 
 export default function Disponibilidades() {
+
+    useAuth();
+
     const [dayOfWeek, setDayOfWeek] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");

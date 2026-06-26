@@ -9,6 +9,7 @@ import {
     reviewFlashcard
 } from "@/services/api";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
 
 type Flashcard = {
     id: number;
@@ -19,6 +20,9 @@ type Flashcard = {
 };
 
 export default function RevisaoFlashcards() {
+
+    useAuth();
+
     const [showAnswer, setShowAnswer] = useState(false);
     const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);

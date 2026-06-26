@@ -7,8 +7,11 @@ import { useEffect, useState } from "react";
 import {getMe, getSubjects, getAvailabilities, getFlashcards, getFlashcardsForReview} from "@/services/api";
 import { logout } from "@/services/api";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Perfil() {
+
+    useAuth();
 
     const [name, setName] = useState("");
 

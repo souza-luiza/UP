@@ -8,6 +8,7 @@ import TextInput from "../../components/TextInput";
 import RadioInput from "../../components/RadioInput";
 import CardDisciplinas from "../../components/CardDisciplinas";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
 
 type Subject = {
     id: number;
@@ -16,6 +17,9 @@ type Subject = {
 };
 
 export default function Disciplinas() {
+
+    useAuth();
+
     const [name, setName] = useState('');
     const [rating, setRating] = useState<number | undefined>(undefined);
     const [subjects, setSubjects] = useState<Subject[]>([]);

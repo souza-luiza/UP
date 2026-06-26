@@ -62,7 +62,7 @@ export async function login(
 }
 
 export async function getSubjects() {
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/subjects",
         {
             headers: authHeaders()
@@ -80,7 +80,7 @@ export async function createSubject(
     name: string,
     difficulty: number
 ) {
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/subjects",
         {
             method: "POST",
@@ -100,7 +100,7 @@ export async function createSubject(
 }
 
 export async function getAvailabilities() {
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/availabilities",
         {
             headers: authHeaders()
@@ -119,7 +119,7 @@ export async function createAvailability(
     startTime: string,
     endTime: string
 ) {
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/availabilities",
         {
             method: "POST",
@@ -140,7 +140,7 @@ export async function createAvailability(
 }
 
 export async function generateSchedule() {
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/schedule/generate",
         {
             method: "POST",
@@ -156,7 +156,7 @@ export async function generateSchedule() {
 }
 
 export async function getFlashcards() {
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/flashcards",
         {
             headers: authHeaders()
@@ -174,7 +174,7 @@ export async function createFlashcard(
     question: string,
     answer: string
 ) {
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/flashcards",
         {
             method: "POST",
@@ -195,7 +195,7 @@ export async function createFlashcard(
 
 export async function getFlashcardsForReview() {
 
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/flashcards/review",
         {
             headers: authHeaders()
@@ -214,7 +214,7 @@ export async function reviewFlashcard(
     correct: boolean
 ) {
 
-    const response = await fetch(
+    const response = await authFetch(
         `http://localhost:8080/flashcards/${id}/review`,
         {
             method: "POST",
@@ -234,7 +234,7 @@ export async function reviewFlashcard(
 
 export async function getMe() {
 
-    const response = await fetch(
+    const response = await authFetch(
         "http://localhost:8080/users/me",
         {
             headers: authHeaders()
@@ -272,7 +272,7 @@ export async function logout() {
 
 export async function deleteSubject(id: number) {
 
-    const response = await fetch(
+    const response = await authFetch(
         `http://localhost:8080/subjects/${id}`,
         {
             method: "DELETE",
@@ -287,7 +287,7 @@ export async function deleteSubject(id: number) {
 
 export async function deleteAvailability(id: number) {
 
-    const response = await fetch(
+    const response = await authFetch(
         `http://localhost:8080/availabilities/${id}`,
         {
             method: "DELETE",
@@ -302,7 +302,7 @@ export async function deleteAvailability(id: number) {
 }
 
 export async function deleteFlashcard(id: number) {
-    const response = await fetch(
+    const response = await authFetch(
         `http://localhost:8080/flashcards/${id}`,
         {
             method: "DELETE",
@@ -313,4 +313,65 @@ export async function deleteFlashcard(id: number) {
     if (!response.ok) {
         throw new Error("Erro ao excluir flashcard");
     }
+}
+
+async function refreshToken() {
+
+    const response = await fetch(
+        "http://localhost:8080/auth/refresh",
+        {
+            method: "POST",
+            credentials: "include"
+        }
+    );
+
+    if (!response.ok) {
+        return false;
+    }
+
+    const data = await response.json();
+
+    localStorage.setItem("accessToken", data.accessToken);
+
+    return true;
+}
+
+async function authFetch(
+    url: string,
+    options: RequestInit = {}
+) {
+
+    let response = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            Authorization: `Bearer ${getToken()}`
+        },
+        credentials: "include"
+    });
+
+    if (response.status !== 401) {
+        return response;
+    }
+
+    const refreshed = await refreshToken();
+
+    if (!refreshed) {
+
+        logout();
+
+        throw new Error("Sessão expirada");
+
+    }
+
+    response = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            Authorization: `Bearer ${getToken()}`
+        },
+        credentials: "include"
+    });
+
+    return response;
 }

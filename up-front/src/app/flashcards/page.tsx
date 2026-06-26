@@ -7,6 +7,7 @@ import Logo from "../../components/Logo";
 import TextInput from "../../components/TextInput";
 import CardFlashcard from "@/components/CardFlashcard";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
 
 type Flashcard = {
     id: number;
@@ -17,6 +18,9 @@ type Flashcard = {
 };
 
 export default function Flashcards() {
+
+    useAuth();
+
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
     const [flashcards, setFlashcards] = useState<Flashcard[]>([]);

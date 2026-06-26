@@ -6,8 +6,12 @@ import Logo from "../../components/Logo";
 import CardCronograma from "@/components/CardCronograma";
 import { generateSchedule, logout } from "@/services/api";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Cronogramas() {
+
+    useAuth();
+
     const [schedule, setSchedule] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
