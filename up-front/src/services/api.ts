@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8080";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 function getToken() {
     return localStorage.getItem("accessToken");
@@ -39,8 +39,7 @@ export async function login(
     email: string,
     password: string
 ) {
-    const response = await fetch(
-        "http://localhost:8080/auth/login",
+    const response = await fetch(`${API_URL}/auth/login`,
         {
             method: "POST",
             credentials: "include",
@@ -62,8 +61,7 @@ export async function login(
 }
 
 export async function getSubjects() {
-    const response = await authFetch(
-        "http://localhost:8080/subjects",
+    const response = await authFetch(`${API_URL}/subjects`,
         {
             headers: authHeaders()
         }
@@ -80,8 +78,7 @@ export async function createSubject(
     name: string,
     difficulty: number
 ) {
-    const response = await authFetch(
-        "http://localhost:8080/subjects",
+    const response = await authFetch(`${API_URL}/subjects`,
         {
             method: "POST",
             headers: authHeaders(),
@@ -100,8 +97,7 @@ export async function createSubject(
 }
 
 export async function getAvailabilities() {
-    const response = await authFetch(
-        "http://localhost:8080/availabilities",
+    const response = await authFetch(`${API_URL}/availabilities`,
         {
             headers: authHeaders()
         }
@@ -119,8 +115,7 @@ export async function createAvailability(
     startTime: string,
     endTime: string
 ) {
-    const response = await authFetch(
-        "http://localhost:8080/availabilities",
+    const response = await authFetch(`${API_URL}/availabilities`,
         {
             method: "POST",
             headers: authHeaders(),
@@ -140,8 +135,7 @@ export async function createAvailability(
 }
 
 export async function generateSchedule() {
-    const response = await authFetch(
-        "http://localhost:8080/schedule/generate",
+    const response = await authFetch(`${API_URL}/schedule/generate`,
         {
             method: "POST",
             headers: authHeaders()
@@ -156,8 +150,7 @@ export async function generateSchedule() {
 }
 
 export async function getFlashcards() {
-    const response = await authFetch(
-        "http://localhost:8080/flashcards",
+    const response = await authFetch(`${API_URL}/flashcards`,
         {
             headers: authHeaders()
         }
@@ -174,8 +167,7 @@ export async function createFlashcard(
     question: string,
     answer: string
 ) {
-    const response = await authFetch(
-        "http://localhost:8080/flashcards",
+    const response = await authFetch(`${API_URL}/flashcards`,
         {
             method: "POST",
             headers: authHeaders(),
@@ -195,8 +187,7 @@ export async function createFlashcard(
 
 export async function getFlashcardsForReview() {
 
-    const response = await authFetch(
-        "http://localhost:8080/flashcards/review",
+    const response = await authFetch(`${API_URL}/flashcards/review`,
         {
             headers: authHeaders()
         }
@@ -214,8 +205,7 @@ export async function reviewFlashcard(
     correct: boolean
 ) {
 
-    const response = await authFetch(
-        `http://localhost:8080/flashcards/${id}/review`,
+    const response = await authFetch(`${API_URL}/flashcards/${id}/review`,
         {
             method: "POST",
             headers: authHeaders(),
@@ -234,8 +224,7 @@ export async function reviewFlashcard(
 
 export async function getMe() {
 
-    const response = await authFetch(
-        "http://localhost:8080/users/me",
+    const response = await authFetch(`${API_URL}/users/me`,
         {
             headers: authHeaders()
         }
@@ -252,8 +241,7 @@ export async function logout() {
 
     try {
 
-        await fetch(
-            "http://localhost:8080/auth/logout",
+        await fetch(`${API_URL}/users/me/auth/logout`,
             {
                 method: "POST",
                 credentials: "include"
@@ -272,8 +260,7 @@ export async function logout() {
 
 export async function deleteSubject(id: number) {
 
-    const response = await authFetch(
-        `http://localhost:8080/subjects/${id}`,
+    const response = await authFetch(`${API_URL}/subjects/${id}`,
         {
             method: "DELETE",
             headers: authHeaders()
@@ -287,8 +274,7 @@ export async function deleteSubject(id: number) {
 
 export async function deleteAvailability(id: number) {
 
-    const response = await authFetch(
-        `http://localhost:8080/availabilities/${id}`,
+    const response = await authFetch(`${API_URL}/availabilities/${id}`,
         {
             method: "DELETE",
             headers: authHeaders()
@@ -302,8 +288,7 @@ export async function deleteAvailability(id: number) {
 }
 
 export async function deleteFlashcard(id: number) {
-    const response = await authFetch(
-        `http://localhost:8080/flashcards/${id}`,
+    const response = await authFetch(`${API_URL}/flashcards/${id}`,
         {
             method: "DELETE",
             headers: authHeaders()
@@ -317,8 +302,7 @@ export async function deleteFlashcard(id: number) {
 
 async function refreshToken() {
 
-    const response = await fetch(
-        "http://localhost:8080/auth/refresh",
+    const response = await fetch(`${API_URL}/auth/refresh`,
         {
             method: "POST",
             credentials: "include"
