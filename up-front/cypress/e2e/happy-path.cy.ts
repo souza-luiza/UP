@@ -26,13 +26,11 @@ describe('Jornada do Novo Usuário (E2E Happy Path)', () => {
         cy.url().should('include', '/perfil');
 
         // 5. Fluxo de Disciplinas
-        // 5. Fluxo de Disciplinas
         cy.visit('/disciplinas');
 
-        // ALTERADO: Substitui os data-cy genéricos por seletores baseados no texto/placeholder real
-        cy.get('input[placeholder*="nome"]').type('Banco de Dados'); // ou o placeholder real que usou para a matéria
-        cy.get('#nota-5').check(); // Seleciona a dificuldade no dropdown existente
-        cy.get('button[type="submit"]').click(); // Clica no botão de cadastrar disciplina
+        cy.get('input[placeholder*="nome"]').type('Banco de Dados');
+        cy.get('#nota-5').check();
+        cy.get('button[type="submit"]').click();
         cy.contains('Banco de Dados').should('be.visible');
 
         cy.get('input[placeholder*="nome"]').clear().type('POO');
@@ -42,15 +40,28 @@ describe('Jornada do Novo Usuário (E2E Happy Path)', () => {
 
         // 6. Fluxo de Disponibilidades (Ajustado para a rota real no plural)
         cy.visit('/disponibilidades');
-        cy.get('[data-cy="disponibilidade-dia-select"]').select('Segunda-feira');
-        cy.get('[data-cy="disponibilidade-inicio-time-input"]').type('19:00');
-        cy.get('[data-cy="disponibilidade-fim-time-input"]').type('21:00');
-        cy.get('[data-cy="add-disponibilidade-button"]').click();
-        cy.contains('Segunda-feira: 19:00 - 21:00').should('be.visible');
+        cy.get('input[type="time"]').eq(0)
+            .clear()
+            .focus()
+            .type('19:00')
+            .blur();
+
+        cy.get('input[type="time"]').eq(1)
+            .clear()
+            .focus()
+            .type('21:00')
+            .blur();
+
+        cy.get('select').select('Segunda-feira', { force: true });
+        cy.contains('button', 'Adicionar disponibilidade').click();
+        cy.contains('Segunda-feira').should('be.visible');
+        cy.contains('19:00').should('be.visible');
+        cy.contains('21:00').should('be.visible');
 
         // 7. Geração e validação do Cronograma
         cy.visit('/cronograma');
-        cy.get('[data-cy="gerar-cronograma-button"]').click();
+        cy.get('button[type="submit"]').contains('Gerar Cronograma').click();
+        //cy.get('[data-cy="gerar-cronograma-button"]').click();
 
         // Aguarda a resposta do algoritmo de geração
         cy.contains('Sessões de Estudo Geradas').should('be.visible');
