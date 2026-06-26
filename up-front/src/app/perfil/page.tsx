@@ -4,13 +4,7 @@ import Button from "../../components/Button";
 import CardInfos from "../../components/CardInfos";
 import Logo from "../../components/Logo";
 import { useEffect, useState } from "react";
-import {
-    getMe,
-    getSubjects,
-    getAvailabilities,
-    getFlashcards,
-    getFlashcardsForReview
-} from "@/services/api";
+import {getMe, getSubjects, getAvailabilities, getFlashcards, getFlashcardsForReview} from "@/services/api";
 import { logout } from "@/services/api";
 import { toast } from "react-toastify";
 
@@ -113,12 +107,10 @@ export default function Perfil() {
             <main className="flex flex-col p-6 gap-8 md:px-20 max-w-7xl mx-auto w-full">
                 <h2 className="text-h2 text-black font-semibold">Olá, {name}</h2>
                 
-                {/* Grid ou Flex responsivo para os cards ficarem alinhados */}
-                <div className="flex flex-wrap gap-4 items-center self-stretch">
+                <div className="flex flex-wrap gap-4 items-stretch">
                     <CardInfos variant="disciplinas" value={subjects} />
                     <CardInfos variant="disponibilidades" value={availabilities} />
                     <CardInfos variant="flashcards" value={flashcards} />
-                    <CardInfos variant="sessões" value={subjects > 0 && availabilities > 0 ? "✓" : "-"} />
                 </div>
 
                 <div className="flex items-start gap-8 flex-col self-stretch">
