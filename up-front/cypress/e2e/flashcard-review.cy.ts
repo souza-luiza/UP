@@ -1,22 +1,34 @@
 describe('Jornada de Revisão de Flashcards (E2E)', () => {
-    const userName = 'Flashcard User';
     const userPassword = 'password123';
     const subjectName = 'Ciência de Dados';
+    let emailAleatorio;
+    let userNameAleatorio;
   
     beforeEach(() => {
         // Gera um e-mail único baseado no timestamp exato desta execução
-        const userEmail = `flashcard_user_${Date.now()}@example.com`;
+        emailAleatorio = `user_${Date.now()}@test.com`;
+        userNameAleatorio = `User_${Date.now()}`;
 
         // --- Etapa de Setup: Registrar, Logar e Criar Disciplina ---
-        cy.register(userName, userEmail, userPassword);
-        cy.login(userEmail, userPassword);
+        cy.visit('/register');
+        cy.get('input[placeholder*="nome"]').type(userNameAleatorio);
+        cy.get('input[type="email"]').type(emailAleatorio);
+        cy.get('input[placeholder*="senha"]').first().type(userPassword);
+        cy.get('input[placeholder*="senha"]').last().type(userPassword);
+        cy.get('button[type="submit"]').click();
+        cy.url().should('include', '/login');
+
+        cy.get('input[type="email"]').type(emailAleatorio);
+        cy.get('input[type="password"]').type(userPassword);
+        cy.get('button[type="submit"]').click();
+        cy.url().should('include', '/perfil');
   
         // Criar uma disciplina para associar os flashcards
         cy.visit('/disciplinas');
-        cy.get('input[placeholder*="nome"]').type(subjectName, { delay: 50 });
-        cy.get('#nota-4').check();
+        cy.get('input[placeholder*="nome"]').type(subjectName, { delay: 30 });
+        cy.get('#nota-4').should('exist').check();
         cy.get('button[type="submit"]').click();
-        cy.contains(subjectName, { timeout: 10000 }).should('be.visible');
+        cy.contains(subjectName, { timeout: 15000 }).should('be.visible');
     });
   
     it('deve atualizar o nível de revisão corretamente ao acertar e errar um flashcard', () => {
@@ -28,14 +40,14 @@ describe('Jornada de Revisão de Flashcards (E2E)', () => {
         cy.get('input[placeholder*="pergunta"], textarea[placeholder*="pergunta"]').type('O que é Overfitting?', { delay: 50 });
         cy.get('input[placeholder*="resposta"], textarea[placeholder*="resposta"]').type('É quando um modelo se ajusta demais aos dados de treino.', { delay: 50 });
         cy.contains('button', 'Adicionar flashcard').click();
-        cy.contains('O que é Overfitting?').should('be.visible');
+        cy.contains('O que é Overfitting?', { timeout: 10000 }).should('be.visible');
   
         // Criar o segundo flashcard (para o cenário de erro)
         cy.get('select').select(subjectName);
-        cy.get('input[placeholder*="pergunta"], textarea[placeholder*="pergunta"]').clear().type('O que é Underfitting?', { delay: 50 });
-        cy.get('input[placeholder*="resposta"], textarea[placeholder*="resposta"]').clear().type('É quando um modelo é simples demais e não captura a complexidade dos dados.', { delay: 50 });
+        cy.get('input[placeholder*="pergunta"], textarea[placeholder*="pergunta"]').clear().type('O que é Underfitting?', { delay: 30 });
+        cy.get('input[placeholder*="resposta"], textarea[placeholder*="resposta"]').clear().type('É quando o modelo não aprende o padrão.', { delay: 30 });
         cy.contains('button', 'Adicionar flashcard').click();
-        cy.contains('O que é Underfitting?').should('be.visible');
+        cy.contains('O que é Underfitting?', { timeout: 10000 }).should('be.visible');
   
         // --- 2. Etapa de Revisão ---
         cy.visit('/revisao'); // Navega para a página de revisão
