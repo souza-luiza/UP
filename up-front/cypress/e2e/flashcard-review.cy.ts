@@ -1,6 +1,3 @@
-/// <reference types="cypress" />
-/// <reference types="mocha" />
-
 describe('Jornada de Revisão de Flashcards (E2E)', () => {
     const userName = 'Flashcard User';
     const userPassword = 'password123';
