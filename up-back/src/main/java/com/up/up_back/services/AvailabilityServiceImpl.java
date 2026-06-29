@@ -22,6 +22,17 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
         if (!dto.endTime().isAfter(dto.startTime())) throw new IllegalArgumentException("End time must be after start time");
 
+        List<Availability> availabilities = availabilityRepository.findByUser(user);
+
+        boolean overlaps = availabilities.stream()
+                .anyMatch(existing ->
+                        existing.getDayOfWeek() == dto.dayOfWeek()
+                        && dto.startTime().isBefore(existing.getEndTime())
+                        && dto.endTime().isAfter(existing.getStartTime())
+                );
+
+        if (overlaps) throw new IllegalArgumentException("Availability overlaps with an existing one.");
+
         Availability availability = Availability.builder()
                 .dayOfWeek(dto.dayOfWeek())
                 .startTime(dto.startTime())
