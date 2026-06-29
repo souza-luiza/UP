@@ -34,22 +34,21 @@ public class ScheduleGeneratorServiceImpl implements ScheduleGeneratorService {
                 .mapToInt(Subject::difficulty)
                 .sum();
 
+        List<Long> minutesPerSubject = new ArrayList<>();
+
         long allocatedMinutes = 0;
 
         for (int i = 0; i < subjects.size(); i++) {
 
-            Subject subject = subjects.get(i);
+            long subjectMinutes = availableMinutes * subjects.get(i).difficulty() / totalDifficulty;
 
-            long subjectMinutes = availableMinutes * subject.difficulty() / totalDifficulty;
-
-            boolean isLastSubject = i == subjects.size() - 1;
-
-            if (isLastSubject) subjectMinutes = availableMinutes - allocatedMinutes;
-
-            allocateSubject(subject, subjectMinutes, availabilities, sessions);
+            if (i == subjects.size() - 1) subjectMinutes = availableMinutes - allocatedMinutes;
 
             allocatedMinutes += subjectMinutes;
+            minutesPerSubject.add(subjectMinutes);
         }
+
+        allocateSessions(subjects, minutesPerSubject, availabilities, sessions);
 
         return sessions;
     }
@@ -64,41 +63,41 @@ public class ScheduleGeneratorServiceImpl implements ScheduleGeneratorService {
                 .sum();
     }
 
-    private void allocateSubject(Subject subject, long subjectMinutes, List<Availability> availabilities, List<StudySession> sessions) {
+    private void allocateSessions(List<Subject> subjects, List<Long> minutesPerSubject, List<Availability> availabilities, List<StudySession> sessions) {
 
-        long remainingMinutes = subjectMinutes;
+        int subjectIndex = 0;
+        long remainingSubjectMinutes = minutesPerSubject.getFirst();
 
         for(Availability availability : availabilities) {
 
-            if(remainingMinutes <= 0) break;
+            LocalTime current = availability.start();
 
             long availabilityMinutes = Duration.between(availability.start(), availability.end()).toMinutes();
 
-            long minutesToAllocate = Math.min(remainingMinutes, availabilityMinutes);
+            while (availabilityMinutes > 0 && subjectIndex < subjects.size()) {
 
-            long currentMinute = availability.start().toSecondOfDay() / 60;
-
-            long remainingAvailabilityMinutes = minutesToAllocate;
-
-            while (remainingAvailabilityMinutes > 0) {
-
-                long sessionMinutes = Math.min(remainingAvailabilityMinutes, MAX_SESSION_MINUTES);
+                long sessionMinutes = Math.min(Math.min(availabilityMinutes, remainingSubjectMinutes), MAX_SESSION_MINUTES);
 
                 StudySession session = StudySession.builder()
-                        .subjectName(subject.name())
+                        .subjectName(subjects.get(subjectIndex).name())
                         .dayOfWeek(availability.dayOfWeek())
-                        .start(LocalTime.of((int) currentMinute / 60, (int) currentMinute % 60))
-                        .end(LocalTime.of((int) (currentMinute + sessionMinutes) / 60, (int) (currentMinute + sessionMinutes) % 60))
+                        .start(current)
+                        .end(current.plusMinutes(sessionMinutes))
                         .build();
 
                 sessions.add(session);
 
-                currentMinute += sessionMinutes;
+                current = current.plusMinutes(sessionMinutes);
 
-                remainingAvailabilityMinutes -= sessionMinutes;
+                availabilityMinutes -= sessionMinutes;
+
+                remainingSubjectMinutes -= sessionMinutes;
+
+                if (remainingSubjectMinutes == 0) {
+                    subjectIndex++;
+                    if (subjectIndex < subjects.size()) remainingSubjectMinutes = minutesPerSubject.get(subjectIndex);
+                }
             }
-
-            remainingMinutes -= minutesToAllocate;
         }
     }
 }

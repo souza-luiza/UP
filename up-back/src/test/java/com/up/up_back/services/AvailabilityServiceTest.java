@@ -12,10 +12,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AvailabilityServiceTest {
@@ -102,5 +103,100 @@ class AvailabilityServiceTest {
                 IllegalArgumentException.class,
                 () -> availabilityService.create(dto, user)
         );
+    }
+
+    @Test
+    void shouldNotAllowOverlappingAvailabilities() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        CreateAvailabilityDto dto = new CreateAvailabilityDto(
+                DayOfWeek.MONDAY,
+                LocalTime.of(15, 0),
+                LocalTime.of(17, 0)
+        );
+
+        Availability existing = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .startTime(LocalTime.of(14, 0))
+                .endTime(LocalTime.of(16, 0))
+                .user(user)
+                .build();
+
+        when(availabilityRepository.findByUser(user))
+                .thenReturn(List.of(existing));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> availabilityService.create(dto, user)
+        );
+
+        verify(availabilityRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldAllowAdjacentAvailabilities() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        Availability existing = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .startTime(LocalTime.of(14, 0))
+                .endTime(LocalTime.of(16, 0))
+                .user(user)
+                .build();
+
+        CreateAvailabilityDto dto = new CreateAvailabilityDto(
+                DayOfWeek.MONDAY,
+                LocalTime.of(16, 0),
+                LocalTime.of(18, 0)
+        );
+
+        when(availabilityRepository.findByUser(user))
+                .thenReturn(List.of(existing));
+
+        when(availabilityRepository.save(any()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Availability availability = availabilityService.create(dto, user);
+
+        assertNotNull(availability);
+
+        verify(availabilityRepository).save(any());
+    }
+
+    @Test
+    void shouldNotAllowEqualAvailabilities() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        CreateAvailabilityDto dto = new CreateAvailabilityDto(
+                DayOfWeek.MONDAY,
+                LocalTime.of(14, 0),
+                LocalTime.of(16, 0)
+        );
+
+        Availability existing = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .startTime(LocalTime.of(14, 0))
+                .endTime(LocalTime.of(16, 0))
+                .user(user)
+                .build();
+
+        when(availabilityRepository.findByUser(user))
+                .thenReturn(List.of(existing));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> availabilityService.create(dto, user)
+        );
+
+        verify(availabilityRepository, never()).save(any());
     }
 }

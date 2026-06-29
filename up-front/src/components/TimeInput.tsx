@@ -4,12 +4,12 @@ interface TimeInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'ty
     label?: string;
 }
 
-export default function TimeInput({ label, id, ...props }: TimeInputProps) {
+export default function TimeInput({ label, id, className, ...props }: TimeInputProps) {
     return(
-        <div className="flex flex-col items-start">
+        <div className="flex flex-col items-start w-full gap-1.5">
             
             {label && (
-                <label htmlFor={id} className="text-h5">
+                <label htmlFor={id} className="text-p font-semibold text-neutral-800">
                     {label}
                 </label>
             )}
@@ -18,7 +18,7 @@ export default function TimeInput({ label, id, ...props }: TimeInputProps) {
                 id={id}
                 type="time"
                 {...props}
-                className="border-1 border-black rounded-sm-custom cursor-pointer"
+                className={`w-full py-2 px-3 border border-secondary-dark/20 rounded-sm-custom bg-white cursor-pointer text-p text-neutral-800 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all ${className || ''}`}
             />
             
         </div>

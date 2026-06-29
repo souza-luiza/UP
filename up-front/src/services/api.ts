@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8081";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 function getToken() {
     return localStorage.getItem("accessToken");
@@ -39,10 +39,10 @@ export async function login(
     email: string,
     password: string
 ) {
-    const response = await fetch(
-        `${API_URL}/auth/login`,
+    const response = await fetch(`${API_URL}/auth/login`,
         {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -61,8 +61,7 @@ export async function login(
 }
 
 export async function getSubjects() {
-    const response = await fetch(
-        `${API_URL}/subjects`,
+    const response = await authFetch(`${API_URL}/subjects`,
         {
             headers: authHeaders()
         }
@@ -79,8 +78,7 @@ export async function createSubject(
     name: string,
     difficulty: number
 ) {
-    const response = await fetch(
-        `${API_URL}/subjects`,
+    const response = await authFetch(`${API_URL}/subjects`,
         {
             method: "POST",
             headers: authHeaders(),
@@ -99,8 +97,7 @@ export async function createSubject(
 }
 
 export async function getAvailabilities() {
-    const response = await fetch(
-        `${API_URL}/availabilities`,
+    const response = await authFetch(`${API_URL}/availabilities`,
         {
             headers: authHeaders()
         }
@@ -118,8 +115,7 @@ export async function createAvailability(
     startTime: string,
     endTime: string
 ) {
-    const response = await fetch(
-        `${API_URL}/availabilities`,
+    const response = await authFetch(`${API_URL}/availabilities`,
         {
             method: "POST",
             headers: authHeaders(),
@@ -139,10 +135,12 @@ export async function createAvailability(
 }
 
 export async function generateSchedule() {
-    const response = await fetch(`${API_URL}/schedule/generate`, {
-        method: "POST",
-        headers: authHeaders()
-    });
+    const response = await authFetch(`${API_URL}/schedule/generate`,
+        {
+            method: "POST",
+            headers: authHeaders()
+        }
+    );
 
     if (!response.ok) {
         throw new Error("Erro ao gerar cronograma");
@@ -152,8 +150,7 @@ export async function generateSchedule() {
 }
 
 export async function getFlashcards() {
-    const response = await fetch(
-        `${API_URL}/flashcards`,
+    const response = await authFetch(`${API_URL}/flashcards`,
         {
             headers: authHeaders()
         }
@@ -170,8 +167,7 @@ export async function createFlashcard(
     question: string,
     answer: string
 ) {
-    const response = await fetch(
-        `${API_URL}/flashcards`,
+    const response = await authFetch(`${API_URL}/flashcards`,
         {
             method: "POST",
             headers: authHeaders(),
@@ -191,8 +187,7 @@ export async function createFlashcard(
 
 export async function getFlashcardsForReview() {
 
-    const response = await fetch(
-        `${API_URL}/flashcards/review`,
+    const response = await authFetch(`${API_URL}/flashcards/review`,
         {
             headers: authHeaders()
         }
@@ -210,8 +205,7 @@ export async function reviewFlashcard(
     correct: boolean
 ) {
 
-    const response = await fetch(
-        `${API_URL}/flashcards/${id}/review`,
+    const response = await authFetch(`${API_URL}/flashcards/${id}/review`,
         {
             method: "POST",
             headers: authHeaders(),
@@ -226,4 +220,142 @@ export async function reviewFlashcard(
     }
 
     return response.json();
+}
+
+export async function getMe() {
+
+    const response = await authFetch(`${API_URL}/users/me`,
+        {
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao buscar usuário");
+    }
+
+    return response.json();
+}
+
+export async function logout() {
+
+    try {
+
+        await fetch(`${API_URL}/users/me/auth/logout`,
+            {
+                method: "POST",
+                credentials: "include"
+            }
+        );
+
+    } finally {
+
+        localStorage.removeItem("accessToken");
+
+        window.location.href = "/login";
+
+    }
+
+}
+
+export async function deleteSubject(id: number) {
+
+    const response = await authFetch(`${API_URL}/subjects/${id}`,
+        {
+            method: "DELETE",
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao excluir disciplina");
+    }
+}
+
+export async function deleteAvailability(id: number) {
+
+    const response = await authFetch(`${API_URL}/availabilities/${id}`,
+        {
+            method: "DELETE",
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao excluir disponibilidade");
+    }
+
+}
+
+export async function deleteFlashcard(id: number) {
+    const response = await authFetch(`${API_URL}/flashcards/${id}`,
+        {
+            method: "DELETE",
+            headers: authHeaders()
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Erro ao excluir flashcard");
+    }
+}
+
+async function refreshToken() {
+
+    const response = await fetch(`${API_URL}/auth/refresh`,
+        {
+            method: "POST",
+            credentials: "include"
+        }
+    );
+
+    if (!response.ok) {
+        return false;
+    }
+
+    const data = await response.json();
+
+    localStorage.setItem("accessToken", data.accessToken);
+
+    return true;
+}
+
+async function authFetch(
+    url: string,
+    options: RequestInit = {}
+) {
+
+    let response = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            Authorization: `Bearer ${getToken()}`
+        },
+        credentials: "include"
+    });
+
+    if (response.status !== 401) {
+        return response;
+    }
+
+    const refreshed = await refreshToken();
+
+    if (!refreshed) {
+
+        logout();
+
+        throw new Error("Sessão expirada");
+
+    }
+
+    response = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            Authorization: `Bearer ${getToken()}`
+        },
+        credentials: "include"
+    });
+
+    return response;
 }

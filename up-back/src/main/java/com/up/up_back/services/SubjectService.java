@@ -11,4 +11,6 @@ public interface SubjectService {
     Subject create(CreateSubjectDto dto, User user);
 
     List<Subject> findAll(User user);
+
+    void delete(Long id, User user);
 }

@@ -44,4 +44,12 @@ public class AvailabilityController {
                 )
                 .toList();
     }
+
+    @DeleteMapping("/{id}")
+    public void delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        availabilityService.delete(id, userDetails.getUser());
+    }
 }

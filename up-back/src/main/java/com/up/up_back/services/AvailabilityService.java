@@ -10,4 +10,5 @@ public interface AvailabilityService {
 
     Availability create(CreateAvailabilityDto dto, User user);
     List<Availability> findAll(User user);
+    void delete(Long id, User user);
 }

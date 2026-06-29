@@ -6,6 +6,8 @@ import com.up.up_back.entity.User;
 import com.up.up_back.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
@@ -30,6 +32,20 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public List<Subject> findAll(User user) {
         return subjectRepository.findByUser(user);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id, User user) {
+
+        Subject subject = subjectRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Subject not found"));
+
+        if (!subject.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        subjectRepository.delete(subject);
     }
 
 }
