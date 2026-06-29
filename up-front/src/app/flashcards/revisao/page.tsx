@@ -59,7 +59,7 @@ export default function RevisaoFlashcards() {
     const currentNumber = currentIndex + 1;
 
     return (
-        <div className="flex min-h-screen flex-col bg-[#FAFAFA]">
+        <div className="flex min-h-screen flex-col">
             <header className="flex w-full bg-primary py-1.5 px-1 md:px-20 justify-between items-center">
                 <Logo primaryColor={false}/>
                 <nav className="flex gap-4 items-center">

@@ -118,7 +118,7 @@ export default function Perfil() {
 
                 <div className="flex items-start gap-8 flex-col self-stretch">
                     
-                    <div className="w-full bg-slate-50 border border-slate-100 p-5 rounded-md-custom flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="w-full bg-primary/20 border border-slate-100 p-5 rounded-md-custom flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
                             <h3 className="text-h3 text-black font-semibold mb-1">Próximo passo</h3>
                             <p className="text-p text-black font-regular">
@@ -132,7 +132,7 @@ export default function Perfil() {
                         </div>
                     </div>
 
-                    <div className="w-full bg-slate-50 border border-slate-100 p-5 rounded-md-custom flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="w-full bg-primary/20 border border-slate-100 p-5 rounded-md-custom flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
                             <h3 className="text-h3 text-black font-semibold mb-1">Revisões pendentes</h3>
                             {reviews > 0 ? (
