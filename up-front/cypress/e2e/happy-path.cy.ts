@@ -1,5 +1,4 @@
 describe('Jornada do Novo Usuário (E2E Happy Path)', () => {
-    const userName = 'Test User';
     const userPassword = 'TestPassword123!';
 
     it('deve permitir que um novo usuário se registre, faça login e acesse o perfil', () => {
@@ -16,6 +15,9 @@ describe('Jornada do Novo Usuário (E2E Happy Path)', () => {
         cy.get('button[type="submit"]').click();
 
         // 2. Verificar redirecionamento para a tela de login
+        cy.get('.Toastify__toast--success', { timeout: 7000 })
+            .should('be.visible')
+            .and('contain', 'Cadastro realizado com sucesso!');
         cy.url().should('include', '/login');
 
         // 3. Preencher o formulário de login com o e-mail que acabou de ser criado
