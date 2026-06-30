@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -125,11 +126,15 @@ class FlashcardServiceTest {
 
         when(flashcardRepository.findById(1L)).thenReturn(Optional.of(flashcard));
         when(flashcardRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        LocalDate expectedDate = LocalDate.now().plusDays(3);
+
         when(flashcardReviewService.review(anyInt(), anyBoolean())).thenReturn(new ReviewResult(1, LocalDate.now().plusDays(3)));
 
         Flashcard updated = flashcardService.review(1L, true, user);
 
         assertEquals(1, updated.getReviewLevel());
+        assertEquals(expectedDate, updated.getNextReviewDate());
     }
 
     @Test
@@ -149,11 +154,15 @@ class FlashcardServiceTest {
 
         when(flashcardRepository.findById(1L)).thenReturn(Optional.of(flashcard));
         when(flashcardRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        LocalDate expectedDate = LocalDate.now().plusDays(1);
+
         when(flashcardReviewService.review(anyInt(), anyBoolean())).thenReturn(new ReviewResult(0, LocalDate.now().plusDays(1)));
 
         Flashcard updated = flashcardService.review(1L, false, user);
 
         assertEquals(0, updated.getReviewLevel());
+        assertEquals(expectedDate, updated.getNextReviewDate());
     }
 
     @Test
@@ -220,6 +229,88 @@ class FlashcardServiceTest {
         assertThrows(
                 ForbiddenException.class,
                 () -> flashcardService.delete(1L, attacker)
+        );
+    }
+
+    @Test
+    void shouldReturnAllFlashcardsFromUser() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        Flashcard flashcard = Flashcard.builder()
+                .id(1L)
+                .user(user)
+                .build();
+
+        when(flashcardRepository.findByUser(user))
+                .thenReturn(List.of(flashcard));
+
+        List<Flashcard> result = flashcardService.findAllByUser(user);
+
+        assertEquals(1, result.size());
+        assertEquals(flashcard, result.getFirst());
+
+        verify(flashcardRepository).findByUser(user);
+    }
+
+    @Test
+    void shouldReturnCardsDueForReview() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        Flashcard flashcard = Flashcard.builder()
+                .id(1L)
+                .user(user)
+                .nextReviewDate(LocalDate.now())
+                .build();
+
+        when(flashcardRepository.findByUserAndNextReviewDateLessThanEqual(
+                eq(user),
+                any(LocalDate.class)
+        )).thenReturn(List.of(flashcard));
+
+        List<Flashcard> result = flashcardService.findCardsDueForReview(user);
+
+        assertEquals(1, result.size());
+        assertEquals(flashcard, result.getFirst());
+
+        verify(flashcardRepository)
+                .findByUserAndNextReviewDateLessThanEqual(eq(user), any(LocalDate.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFlashcardDoesNotExistForReview() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        when(flashcardRepository.findById(999L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> flashcardService.review(999L, true, user)
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingNonexistentFlashcard() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        when(flashcardRepository.findById(999L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> flashcardService.delete(999L, user)
         );
     }
 }
