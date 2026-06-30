@@ -323,4 +323,157 @@ class ScheduleGeneratorServiceTest {
             );
         }
     }
+
+    @Test
+    void shouldGenerateScheduleWhenAvailableTimeIsExactlyMinimumRequired() {
+
+        Subject bd = Subject.builder()
+                .name("BD")
+                .difficulty(5)
+                .build();
+
+        Subject poo = Subject.builder()
+                .name("POO")
+                .difficulty(5)
+                .build();
+
+        Availability availability = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(19, 0))
+                .end(LocalTime.of(20, 0))
+                .build();
+
+        List<StudySession> sessions =
+                scheduleGeneratorService.generate(
+                        List.of(bd, poo),
+                        List.of(availability),
+                        List.of());
+
+        assertFalse(sessions.isEmpty());
+
+        long totalMinutes = sessions.stream()
+                .mapToLong(s -> Duration.between(s.start(), s.end()).toMinutes())
+                .sum();
+
+        assertEquals(60, totalMinutes);
+    }
+
+    @Test
+    void shouldDistributeMinutesProportionallyBetweenSubjects() {
+
+        Subject easy = Subject.builder()
+                .name("Easy")
+                .difficulty(1)
+                .build();
+
+        Subject hard = Subject.builder()
+                .name("Hard")
+                .difficulty(3)
+                .build();
+
+        Availability availability = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(18, 0))
+                .end(LocalTime.of(22, 0))
+                .build();
+
+        List<StudySession> sessions =
+                scheduleGeneratorService.generate(
+                        List.of(easy, hard),
+                        List.of(availability),
+                        List.of());
+
+        long easyMinutes =
+                sessions.stream()
+                        .filter(s -> s.subjectName().equals("Easy"))
+                        .mapToLong(s ->
+                                Duration.between(s.start(), s.end()).toMinutes())
+                        .sum();
+
+        long hardMinutes =
+                sessions.stream()
+                        .filter(s -> s.subjectName().equals("Hard"))
+                        .mapToLong(s ->
+                                Duration.between(s.start(), s.end()).toMinutes())
+                        .sum();
+
+        assertEquals(60, easyMinutes);
+        assertEquals(180, hardMinutes);
+    }
+
+    @Test
+    void shouldAssignRemainingMinutesToLastSubject() {
+
+        Subject s1 = Subject.builder()
+                .name("S1")
+                .difficulty(1)
+                .build();
+
+        Subject s2 = Subject.builder()
+                .name("S2")
+                .difficulty(1)
+                .build();
+
+        Subject s3 = Subject.builder()
+                .name("S3")
+                .difficulty(1)
+                .build();
+
+        Availability availability = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(18,0))
+                .end(LocalTime.of(19,40))
+                .build();
+
+        List<StudySession> sessions =
+                scheduleGeneratorService.generate(
+                        List.of(s1,s2,s3),
+                        List.of(availability),
+                        List.of());
+
+        long s1Minutes = sessions.stream()
+                .filter(s -> s.subjectName().equals("S1"))
+                .mapToLong(s -> Duration.between(s.start(), s.end()).toMinutes())
+                .sum();
+
+        long s2Minutes = sessions.stream()
+                .filter(s -> s.subjectName().equals("S2"))
+                .mapToLong(s -> Duration.between(s.start(), s.end()).toMinutes())
+                .sum();
+
+        long s3Minutes = sessions.stream()
+                .filter(s -> s.subjectName().equals("S3"))
+                .mapToLong(s -> Duration.between(s.start(), s.end()).toMinutes())
+                .sum();
+
+        assertEquals(33, s1Minutes);
+        assertEquals(33, s2Minutes);
+        assertEquals(34, s3Minutes);
+    }
+
+    @Test
+    void shouldStopGeneratingSessionsWhenAvailabilityEndsExactly() {
+
+        Subject bd = Subject.builder()
+                .name("BD")
+                .difficulty(5)
+                .build();
+
+        Availability availability = Availability.builder()
+                .dayOfWeek(DayOfWeek.MONDAY)
+                .start(LocalTime.of(18,0))
+                .end(LocalTime.of(19,0))
+                .build();
+
+        List<StudySession> sessions =
+                scheduleGeneratorService.generate(
+                        List.of(bd),
+                        List.of(availability),
+                        List.of());
+
+        assertEquals(1, sessions.size());
+
+        assertEquals(LocalTime.of(18,0), sessions.getFirst().start());
+        assertEquals(LocalTime.of(19,0), sessions.getFirst().end());
+    }
 }
