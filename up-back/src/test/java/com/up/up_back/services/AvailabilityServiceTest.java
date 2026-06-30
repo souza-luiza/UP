@@ -9,10 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -198,5 +200,92 @@ class AvailabilityServiceTest {
         );
 
         verify(availabilityRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldReturnAllAvailabilitiesFromUser() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        List<Availability> availabilities = List.of(
+                Availability.builder().user(user).build(),
+                Availability.builder().user(user).build()
+        );
+
+        when(availabilityRepository.findByUser(user))
+                .thenReturn(availabilities);
+
+        List<Availability> result = availabilityService.findAll(user);
+
+        assertEquals(2, result.size());
+        assertEquals(availabilities, result);
+
+        verify(availabilityRepository).findByUser(user);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingNonExistingAvailability() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        when(availabilityRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> availabilityService.delete(1L, user)
+        );
+
+        verify(availabilityRepository).findById(1L);
+    }
+
+    @Test
+    void shouldNotAllowDeletingAnotherUsersAvailability() {
+
+        User owner = User.builder()
+                .id(1L)
+                .build();
+
+        User anotherUser = User.builder()
+                .id(2L)
+                .build();
+
+        Availability availability = Availability.builder()
+                .user(owner)
+                .build();
+
+        when(availabilityRepository.findById(1L))
+                .thenReturn(Optional.of(availability));
+
+        assertThrows(
+                AccessDeniedException.class,
+                () -> availabilityService.delete(1L, anotherUser)
+        );
+
+        verify(availabilityRepository, never()).delete(any());
+    }
+
+    @Test
+    void shouldDeleteAvailabilitySuccessfully() {
+
+        User user = User.builder()
+                .id(1L)
+                .build();
+
+        Availability availability = Availability.builder()
+                .id(1L)
+                .user(user)
+                .build();
+
+        when(availabilityRepository.findById(1L))
+                .thenReturn(Optional.of(availability));
+
+        availabilityService.delete(1L, user);
+
+        verify(availabilityRepository).delete(availability);
     }
 }
